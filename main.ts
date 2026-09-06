@@ -48,8 +48,13 @@ async function serveStatic(pathname: string): Promise<Response> {
   if (!filePath.startsWith(ROOT)) return error("Ugyldig sti", 400);
   try {
     const file = await Deno.readFile(filePath);
-    const type = contentType(extname(filePath)) ?? "application/octet-stream";
-    return new Response(file, { headers: { "content-type": type } });
+    const ext = extname(filePath).toLowerCase();
+    const type = contentType(ext) ?? "application/octet-stream";
+    // Kode og tekst: browseren skal altid spørge igen (ETag-frit, men billigt). Billeder: cache i en dag.
+    const cache = [".jpg", ".jpeg", ".png", ".webp", ".svg", ".ico", ".woff2"].includes(ext)
+      ? "public, max-age=86400"
+      : "no-cache";
+    return new Response(file, { headers: { "content-type": type, "cache-control": cache } });
   } catch {
     if (clean !== "/index.html") {
       try {
