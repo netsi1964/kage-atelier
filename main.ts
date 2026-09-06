@@ -6,9 +6,12 @@ import {
   blendFlour,
   getSavedRecipe,
   getCatalog,
+  imagesWritable,
   listSavedRecipes,
   normalizeLocale,
+  resolveStoreKind,
   saveRecipe,
+  saveRecipeImage,
   type AnalyzeInput,
   type BlendInput,
   type Ingredient,
@@ -65,7 +68,7 @@ async function handler(req: Request): Promise<Response> {
   const locale = normalizeLocale(url.searchParams.get("lang"));
 
   if (req.method === "GET" && path === "/api/health") {
-    return json({ ok: true, service: "kageatelier", runtime: "deno" });
+    return json({ ok: true, service: "kageatelier", runtime: "deno", store: resolveStoreKind(), imageUpload: imagesWritable() });
   }
   if (req.method === "GET" && path === "/api/catalog") {
     return json(getCatalog(locale));
@@ -116,6 +119,21 @@ async function handler(req: Request): Promise<Response> {
       return json(await saveRecipe({ ...body, locale: body.locale ?? locale }), 201);
     } catch (err) {
       return error(err instanceof Error ? err.message : "Kunne ikke gemme opskriften.");
+    }
+  }
+  if (req.method === "POST" && /^\/api\/recipes\/[^/]+\/image$/.test(path)) {
+    const id = path.split("/")[3];
+    const recipe = await getSavedRecipe(id);
+    if (!recipe) return error("Opskrift ikke fundet.", 404);
+    if (!imagesWritable()) {
+      return error(`Upload er slået fra på Deno Deploy. Læg filen som ${recipe.imagePath} i repoet og push.`, 405);
+    }
+    try {
+      const bytes = new Uint8Array(await req.arrayBuffer());
+      const saved = await saveRecipeImage(recipe, bytes, req.headers.get("content-type") ?? "");
+      return json({ ok: true, ...saved, hint: `git add ${saved.path} && git commit -m "Billede: ${recipe.title}" && git push` }, 201);
+    } catch (err) {
+      return error(err instanceof Error ? err.message : "Upload fejlede");
     }
   }
   if (req.method === "GET" && path.startsWith("/api/recipes/")) {

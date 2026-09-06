@@ -75,6 +75,18 @@ deno task migrate-kv
 
 Deno KV kræver ingen opsætning på Deno Deploy. `data/` er ikke i git.
 
+## Billeder til opskrifter
+
+Billeder ligger i repoet i `public/images/recipes/` og kobles til opskriften via filnavnet:
+
+```
+public/images/recipes/<slug>.jpg      (jpeg, png og webp virker også)
+```
+
+Slug'en dannes ved gem (`<titel>-<8 tegn af id>`, fx `rabarber-mandel-3f2a9c1e`) og vises i biblioteket og i API-svaret som `slug`/`imagePath`. Findes filen, sættes cover-billedet automatisk ved læsning. Ingen databaseændring.
+
+Nemmeste arbejdsgang: kør `deno task dev`, åbn `/opskrifter.html`, tryk **Upload billede** på kortet. Filen gemmes med det rigtige navn, og du committer og pusher den. På Deno Deploy er upload slået fra, fordi filsystemet er read-only; der virker kun filer i repoet.
+
 ## Deno Deploy
 
 Appen kører på **https://kage-atelier.netsi1964.deno.net**.

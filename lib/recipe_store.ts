@@ -2,6 +2,7 @@ import { dirname, join } from "jsr:@std/path";
 import { analyzeCake } from "./engine.ts";
 import { localizeMetadata, localizeText, normalizeLocale } from "./i18n.ts";
 import { generateRecipeMetadata } from "./recipe_ai.ts";
+import { attachRepoImage, findRecipeImage, recipeSlug, summaryImageFields } from "./images.ts";
 import type {
   Locale,
   SaveRecipeInput,
@@ -146,9 +147,15 @@ function usedExtras(input: SaveRecipeInput) {
   return (input.extras ?? []).filter((item) => ids.has(item.id));
 }
 
-function summaryOf(recipe: SavedRecipe, locale: Locale): SavedRecipeSummary {
+async function summaryOf(recipe: SavedRecipe, locale: Locale): Promise<SavedRecipeSummary> {
   const metadata = localizeMetadata(locale, recipe.metadata);
+  const found = await findRecipeImage(recipe);
+  const cover = recipe.images.find((image) => image.kind === "cover");
+  const image = found
+    ? { id: cover?.id ?? recipe.id, kind: "cover" as const, status: "ready" as const, url: found.url, alt: cover?.alt ?? recipe.title, prompt: cover?.prompt ?? "" }
+    : cover;
   return {
+    ...summaryImageFields(recipe),
     id: recipe.id,
     title: localizeText(locale, recipe.title),
     createdAt: recipe.createdAt,
@@ -159,7 +166,7 @@ function summaryOf(recipe: SavedRecipe, locale: Locale): SavedRecipeSummary {
     style: metadata.style,
     difficulty: metadata.difficulty,
     tags: metadata.tags,
-    image: recipe.images.find((image) => image.kind === "cover"),
+    image,
     provider: metadata.provider,
   };
 }
@@ -184,14 +191,15 @@ function matches(recipe: SavedRecipe, filters: RecipeFilters) {
 export async function listSavedRecipes(filters: RecipeFilters & { locale?: string } = {}): Promise<SavedRecipeSummary[]> {
   const locale = normalizeLocale(filters.locale);
   const recipes = await backend().list();
-  return recipes
+  const sorted = recipes
     .filter((recipe) => matches(recipe, filters))
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-    .map((recipe) => summaryOf(recipe, locale));
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return await Promise.all(sorted.map((recipe) => summaryOf(recipe, locale)));
 }
 
 export async function getSavedRecipe(id: string): Promise<SavedRecipe | null> {
-  return await backend().get(id);
+  const recipe = await backend().get(id);
+  return recipe ? await attachRepoImage(recipe) : null;
 }
 
 export async function saveRecipe(input: SaveRecipeInput): Promise<SavedRecipe> {
@@ -223,8 +231,10 @@ export async function saveRecipe(input: SaveRecipeInput): Promise<SavedRecipe> {
     },
   ];
 
+  const id = crypto.randomUUID();
   const recipe: SavedRecipe = {
-    id: crypto.randomUUID(),
+    id,
+    slug: recipeSlug({ id, title }),
     title,
     cakeName: input.cakeName?.trim() || title,
     createdAt: now,
@@ -248,5 +258,5 @@ export async function saveRecipe(input: SaveRecipeInput): Promise<SavedRecipe> {
   };
 
   await backend().put(recipe);
-  return recipe;
+  return await attachRepoImage(recipe);
 }

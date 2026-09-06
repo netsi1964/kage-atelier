@@ -47,7 +47,20 @@ export {
 } from "./i18n.ts";
 
 export {
+  closeStore,
   getSavedRecipe,
+  importSavedRecipe,
   listSavedRecipes,
+  resolveStoreKind,
   saveRecipe,
 } from "./recipe_store.ts";
+
+export {
+  attachRepoImage,
+  expectedImagePath,
+  findRecipeImage,
+  imagesWritable,
+  recipeSlug,
+  saveRecipeImage,
+  slugify,
+} from "./images.ts";

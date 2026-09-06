@@ -138,3 +138,9 @@ https://github.com/netsi1964/kage-atelier. KV-lager auto på Deploy. Pull før p
 
 ## [2026-09-06 22:00] Claude — live på Deno Deploy
 https://kage-atelier.netsi1964.deno.net. Push til main deployer direkte: check+test før push.
+
+## [2026-09-06 22:02] Claude — billedmappe (c7 aktiv)
+public/images/recipes/<slug>.jpg kobles automatisk. Lokal upload-endpoint.
+
+## [2026-09-06 22:05] Claude — billeder (c7 frigivet)
+public/images/recipes/<slug>.jpg auto-kobles. Lokal upload i biblioteket. Pushet.

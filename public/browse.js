@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 
 const state = {
+  uploadEnabled: false,
   query: "",
   style: "",
   tag: "",
@@ -37,7 +38,10 @@ function renderList(items) {
   $("browseGrid").innerHTML = items.map((item) => {
     const image = item.image?.url
       ? `<img class="browse-image" src="${item.image.url}" alt="${item.image.alt}" />`
-      : `<div class="browse-placeholder">Billede klar senere<br><span>${item.image?.prompt ?? "AI-prompt gemt til senere"}</span></div>`;
+      : `<div class="browse-placeholder">Intet billede endnu<br><span>Læg filen i repoet som <code>${item.imagePath}</code></span></div>`;
+    const upload = state.uploadEnabled
+      ? `<label class="btn btn-ghost upload-btn">${item.image?.url ? "Skift billede" : "Upload billede"}<input type="file" accept="image/jpeg,image/png,image/webp" data-upload="${item.id}" hidden /></label>`
+      : "";
     return `
       <article class="card browse-card">
         ${image}
@@ -57,11 +61,46 @@ function renderList(items) {
           <div class="browse-footer">
             <span class="tiny">Metadata: ${item.provider}</span>
             <a class="btn btn-gold" href="/index.html?recipe=${encodeURIComponent(item.id)}">Åbn i atelieret</a>
+            ${upload}
           </div>
+          <div class="tiny upload-status" data-status="${item.id}"></div>
         </div>
       </article>
     `;
   }).join("");
+  $("browseGrid").querySelectorAll("[data-upload]").forEach((input) => {
+    input.onchange = () => uploadImage(input.dataset.upload, input.files?.[0]);
+  });
+}
+
+async function uploadImage(id, file) {
+  if (!file) return;
+  const status = document.querySelector(`[data-status="${id}"]`);
+  if (status) status.textContent = "Uploader…";
+  try {
+    const res = await fetch(`/api/recipes/${encodeURIComponent(id)}/image`, {
+      method: "POST",
+      headers: { "content-type": file.type },
+      body: file,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Upload fejlede");
+    if (status) status.textContent = `Gemt som ${data.path}. ${data.hint}`;
+    await refresh();
+    const after = document.querySelector(`[data-status="${id}"]`);
+    if (after) after.textContent = `Gemt som ${data.path}. Husk: git add + commit + push.`;
+  } catch (err) {
+    if (status) status.textContent = err.message;
+  }
+}
+
+async function loadHealth() {
+  try {
+    const health = await api("/api/health");
+    state.uploadEnabled = Boolean(health.imageUpload);
+  } catch {
+    state.uploadEnabled = false;
+  }
 }
 
 async function refresh() {
@@ -94,4 +133,4 @@ function bind() {
 
 applyTheme(state.theme);
 bind();
-refresh();
+loadHealth().then(refresh);

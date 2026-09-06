@@ -198,6 +198,10 @@ export interface SavedRecipe {
   analysis: SavedRecipeAnalysis;
   metadata: RecipeMetadata;
   images: RecipeImageAsset[];
+  /** Filnavn-basis for billede i repoet: public/images/recipes/<slug>.jpg */
+  slug?: string;
+  /** Beregnet ved læsning: forventet sti til billedfilen */
+  imagePath?: string;
 }
 
 export interface SavedRecipeSummary {
@@ -213,6 +217,8 @@ export interface SavedRecipeSummary {
   tags: string[];
   image?: RecipeImageAsset;
   provider: string;
+  slug: string;
+  imagePath: string;
 }
 
 export interface SaveRecipeInput {

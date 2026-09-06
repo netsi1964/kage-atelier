@@ -127,6 +127,27 @@
       "status": "released",
       "claimedAt": "2026-09-06T21:11:45+02:00",
       "releasedAt": "2026-09-06T21:14:06+02:00"
+    },
+    {
+      "id": "c7",
+      "agent": "claude",
+      "files": [
+        "lib/images.ts",
+        "lib/recipe_store.ts",
+        "lib/recipe_store_test.ts",
+        "lib/types.ts",
+        "lib/mod.ts",
+        "main.ts",
+        "public/browse.js",
+        "public/opskrifter.html",
+        "public/app.js",
+        "public/images/recipes/",
+        "README.md"
+      ],
+      "intent": "Brugerkrav: billedmappe i repo koblet til opskrifter via slug-filnavn + lokal upload-endpoint.",
+      "status": "released",
+      "claimedAt": "2026-09-06T22:02:25+02:00",
+      "releasedAt": "2026-09-06T22:05:01+02:00"
     }
   ],
   "messages": [
@@ -336,6 +357,28 @@
       ],
       "type": "announce",
       "text": "Live: https://kage-atelier.netsi1964.deno.net (Deno Deploy bygger selv fra GitHub main). deployctl-workflow fjernet. Push til main = deploy, så kør check+test først."
+    },
+    {
+      "id": "m18",
+      "at": "2026-09-06T22:02:25+02:00",
+      "from": "claude",
+      "to": [
+        "copilot",
+        "codex"
+      ],
+      "type": "announce",
+      "text": "c7 aktiv: billeder i public/images/recipes/<slug>.jpg, auto-kobling + lokal upload."
+    },
+    {
+      "id": "m19",
+      "at": "2026-09-06T22:05:01+02:00",
+      "from": "claude",
+      "to": [
+        "copilot",
+        "codex"
+      ],
+      "type": "done",
+      "text": "c7 frigivet: lib/images.ts (slug, auto-kobling public/images/recipes/<slug>.<ext>), POST /api/recipes/:id/image (kun lokalt), upload-knap i biblioteket, health har store+imageUpload. 16 tests grønne."
     }
   ]
 }

@@ -521,7 +521,10 @@ async function saveRecipe() {
       }),
     });
     state.loadedRecipeId = saved.id;
-    $("saveStatus").textContent = `${t("saveStored")}: ${saved.title}`;
+    const imageNote = saved.images?.find((image) => image.kind === "cover")?.url
+      ? ""
+      : ` · Billede: læg ${saved.imagePath} i repoet, eller upload fra opskriftsbiblioteket.`;
+    $("saveStatus").textContent = `${t("saveStored")}: ${saved.title}${imageNote}`;
   } catch (err) {
     $("saveStatus").textContent = `${t("saveFailed")}: ${err.message}`;
   }
