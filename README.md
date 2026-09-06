@@ -73,7 +73,13 @@ Flyt eksisterende opskrifter fra JSON-filen til KV:
 deno task migrate-kv
 ```
 
-Deno KV kræver ingen opsætning på Deno Deploy. `data/` er ikke i git.
+**Vigtigt på Deno Deploy:** KV-databasen skal oprettes og tilknyttes appen i dashboardet, ellers får hver server-isolat sin egen midlertidige KV, og gemte opskrifter forsvinder ved næste deploy eller skift af isolat.
+
+1. Organisationens side → **Databases** → **Provision Database** → vælg **Deno KV**, giv den et navn.
+2. Appen `kage-atelier` → fanen **Databases** → **Attach Database** → vælg KV-instansen.
+3. Ingen kodeændring: `Deno.openKv()` rammer automatisk den tilknyttede database. Deno opretter en separat database pr. miljø (production og branches).
+
+`data/` er ikke i git.
 
 ## Billeder til opskrifter
 

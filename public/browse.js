@@ -38,7 +38,7 @@ function renderList(items) {
   $("browseGrid").innerHTML = items.map((item) => {
     const image = item.image?.url
       ? `<img class="browse-image" src="${item.image.url}" alt="${item.image.alt}" />`
-      : `<div class="browse-placeholder">Intet billede endnu<br><span>Læg filen i repoet som <code>${item.imagePath}</code></span></div>`;
+      : `<div class="browse-placeholder">Intet billede endnu<br><span>Læg filen i repoet som <code>${item.imagePath}</code> (eller .png / .webp)</span></div>`;
     const upload = state.uploadEnabled
       ? `<label class="btn btn-ghost upload-btn">${item.image?.url ? "Skift billede" : "Upload billede"}<input type="file" accept="image/jpeg,image/png,image/webp" data-upload="${item.id}" hidden /></label>`
       : "";

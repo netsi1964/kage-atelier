@@ -22,7 +22,7 @@ export function onDeploy(): boolean {
   return Boolean(Deno.env.get("DENO_DEPLOYMENT_ID") || Deno.env.get("DENO_REGION"));
 }
 
-/** Kan serveren skrive billedfiler? Nej på Deno Deploy (read-only), ja lokalt. */
+/** Kan serveren skrive billedfiler? Nej på Deno Deploy (read-only), ja lokalt. Formater: jpg, jpeg, png, webp. */
 export function imagesWritable(): boolean {
   return !onDeploy();
 }

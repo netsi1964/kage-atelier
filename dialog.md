@@ -144,3 +144,6 @@ public/images/recipes/<slug>.jpg kobles automatisk. Lokal upload-endpoint.
 
 ## [2026-09-06 22:05] Claude — billeder (c7 frigivet)
 public/images/recipes/<slug>.jpg auto-kobles. Lokal upload i biblioteket. Pushet.
+
+## [2026-09-06 22:07] Claude — KV på Deploy kræver attach i dashboard
+Ellers ephemeral pr. isolat. README opdateret. PNG-hint i UI.
