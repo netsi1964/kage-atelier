@@ -24,6 +24,7 @@ interface RecipeBackend {
   list(): Promise<SavedRecipe[]>;
   get(id: string): Promise<SavedRecipe | null>;
   put(recipe: SavedRecipe): Promise<void>;
+  remove(id: string): Promise<boolean>;
 }
 
 function onDeploy(): boolean {
@@ -74,6 +75,14 @@ const fileBackend: RecipeBackend = {
     archive.recipes = [recipe, ...archive.recipes.filter((item) => item.id !== recipe.id)];
     await writeFileArchive(archive);
   },
+  async remove(id) {
+    const archive = await readFileArchive();
+    const before = archive.recipes.length;
+    archive.recipes = archive.recipes.filter((item) => item.id !== id);
+    if (archive.recipes.length === before) return false;
+    await writeFileArchive(archive);
+    return true;
+  },
 };
 
 // ---- kv ----
@@ -122,6 +131,14 @@ const kvBackend: RecipeBackend = {
   async put(recipe) {
     const kv = await openKv();
     await kv.set([...KV_PREFIX, recipe.id], recipe);
+  },
+  async remove(id) {
+    const kv = await openKv();
+    const key = [...KV_PREFIX, id];
+    const entry = await kv.get(key);
+    if (entry.value === null) return false;
+    await kv.delete(key);
+    return true;
   },
 };
 
@@ -195,6 +212,11 @@ export async function listSavedRecipes(filters: RecipeFilters & { locale?: strin
     .filter((recipe) => matches(recipe, filters))
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   return await Promise.all(sorted.map((recipe) => summaryOf(recipe, locale)));
+}
+
+/** Sletter en gemt opskrift. Returnerer false hvis den ikke fandtes. Billedfilen i repoet røres ikke. */
+export async function deleteSavedRecipe(id: string): Promise<boolean> {
+  return await backend().remove(id);
 }
 
 export async function getSavedRecipe(id: string): Promise<SavedRecipe | null> {

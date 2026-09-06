@@ -4,6 +4,7 @@ import {
   analyzeCake,
   analyzePreset,
   blendFlour,
+  deleteSavedRecipe,
   getSavedRecipe,
   getCatalog,
   imagesWritable,
@@ -135,6 +136,12 @@ async function handler(req: Request): Promise<Response> {
     } catch (err) {
       return error(err instanceof Error ? err.message : "Upload fejlede");
     }
+  }
+  if (req.method === "DELETE" && /^\/api\/recipes\/[^/]+$/.test(path)) {
+    const id = path.split("/")[3];
+    const removed = await deleteSavedRecipe(id);
+    if (!removed) return error("Opskrift ikke fundet.", 404);
+    return json({ ok: true, id });
   }
   if (req.method === "GET" && path.startsWith("/api/recipes/")) {
     const id = path.replace("/api/recipes/", "").trim();

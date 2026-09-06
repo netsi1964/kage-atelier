@@ -48,6 +48,7 @@ export {
 
 export {
   closeStore,
+  deleteSavedRecipe,
   getSavedRecipe,
   importSavedRecipe,
   listSavedRecipes,

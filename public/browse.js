@@ -17,8 +17,8 @@ function applyTheme(theme) {
   });
 }
 
-async function api(path) {
-  const res = await fetch(path);
+async function api(path, options = {}) {
+  const res = await fetch(path, options);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "API-fejl");
   return data;
@@ -62,15 +62,30 @@ function renderList(items) {
             <span class="tiny">Metadata: ${item.provider}</span>
             <a class="btn btn-gold" href="/index.html?recipe=${encodeURIComponent(item.id)}">Åbn i atelieret</a>
             ${upload}
+            <button class="btn btn-danger" data-delete="${item.id}" type="button">Slet</button>
           </div>
           <div class="tiny upload-status" data-status="${item.id}"></div>
         </div>
       </article>
     `;
   }).join("");
+  $("browseGrid").querySelectorAll("[data-delete]").forEach((button) => {
+    button.onclick = () => deleteRecipe(button.dataset.delete, button.closest(".browse-card")?.querySelector("h3")?.textContent ?? "");
+  });
   $("browseGrid").querySelectorAll("[data-upload]").forEach((input) => {
     input.onchange = () => uploadImage(input.dataset.upload, input.files?.[0]);
   });
+}
+
+async function deleteRecipe(id, title) {
+  if (!window.confirm(`Slet "${title}"? Det kan ikke fortrydes.`)) return;
+  try {
+    await api(`/api/recipes/${encodeURIComponent(id)}`, { method: "DELETE" });
+    await refresh();
+  } catch (err) {
+    const status = document.querySelector(`[data-status="${id}"]`);
+    if (status) status.textContent = err.message;
+  }
 }
 
 async function uploadImage(id, file) {

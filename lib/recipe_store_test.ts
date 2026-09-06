@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "jsr:@std/assert";
-import { closeStore, getSavedRecipe, listSavedRecipes, saveRecipe } from "./recipe_store.ts";
+import { closeStore, deleteSavedRecipe, getSavedRecipe, listSavedRecipes, saveRecipe } from "./recipe_store.ts";
 import { saveRecipeImage, slugify } from "./images.ts";
 
 Deno.test("gemte opskrifter kan gemmes og hentes igen", async () => {
@@ -60,6 +60,9 @@ Deno.test("kv-lager: gem, list og hent via Deno KV", async () => {
     assertEquals(one?.title, "KV-kage");
     assert(one?.recipe.macros.perSlice.fat > 0);
     assertEquals(await getSavedRecipe("findes-ikke"), null);
+    assertEquals(await deleteSavedRecipe(saved.id), true);
+    assertEquals(await deleteSavedRecipe(saved.id), false);
+    assertEquals((await listSavedRecipes()).length, 0);
   } finally {
     await closeStore();
     Deno.env.delete("KAGEATELIER_STORE");
