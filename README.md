@@ -77,16 +77,9 @@ Deno KV kræver ingen opsætning på Deno Deploy. `data/` er ikke i git.
 
 ## Deno Deploy
 
-```bash
-export DENO_DEPLOY_TOKEN="ddp_..."
-deno task deploy
-```
+Appen kører på **https://kage-atelier.netsi1964.deno.net**.
 
-Nemmest: opret projektet i Deno Deploy-dashboardet fra GitHub-repoet med `main.ts` som entrypoint. Derefter deployer GitHub Action `.github/workflows/deploy.yml` automatisk ved push til `main`.
-
-Forventet URL: `https://kageatelier.deno.dev`
-
-GitHub Action: `.github/workflows/deploy.yml`
+Deno Deploy er koblet direkte til GitHub-repoet og bygger selv ved push til `main` med `main.ts` som entrypoint. Opskrifter gemmes i Deno KV, som er slået til uden opsætning. Der er intet GitHub Action-workflow; `deno task deploy` (deployctl) findes stadig som manuel nødløsning og kræver `DENO_DEPLOY_TOKEN`.
 
 ## Læs videre
 

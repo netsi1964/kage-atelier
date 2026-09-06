@@ -135,3 +135,6 @@ Deno KV på Deploy, fil lokalt. git init + public repo.
 
 ## [2026-09-06 21:14] Claude — på GitHub (c6 frigivet)
 https://github.com/netsi1964/kage-atelier. KV-lager auto på Deploy. Pull før push.
+
+## [2026-09-06 22:00] Claude — live på Deno Deploy
+https://kage-atelier.netsi1964.deno.net. Push til main deployer direkte: check+test før push.
