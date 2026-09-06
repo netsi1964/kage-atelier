@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kageatelier — Byg, vurder og keto-tjek din kage</title>
+  <style>
+    :root {
+      --bg: #1a1410;
+      --bg2: #241c16;
+      --panel: #2c221b;
+      --panel2: #362a21;
+      --line: #4a3a2e;
+      --cream: #f4e6d4;
+      --cream-dim: #c9b39a;
+      --gold: #d4a056;
+      --gold2: #f0c27a;
+      --cocoa: #8b5a2b;
+      --good: #7dba6a;
+      --warn: #e0b04a;
+      --bad: #d36a4a;
+      --keto: #6ec4b8;
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #3a2a1c 0%, transparent 50%),
+        radial-gradient(900px 500px at 110% 10%, #2a1c28 0%, transparent 46%),
+        var(--bg);
+      color: var(--cream);
+      min-height: 100vh;
+    }
+    button, input, select { font-family: "Avenir Next", "Segoe UI", sans-serif; }
+    h1, h2, h3 { font-weight: 600; letter-spacing: .02em; }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 20px 80px; }
+    header.hero {
+      display: flex; justify-content: space-between; gap: 24px; align-items: flex-end;
+      margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .brand { display: flex; gap: 16px; align-items: center; }
+    .logo {
+      width: 58px; height: 58px; border-radius: 16px;
+      background: linear-gradient(145deg, #e8c48a, #8b4e24);
+      display: grid; place-items: center; font-size: 28px;
+      box-shadow: var(--shadow);
+    }
+    .brand h1 { margin: 0; font-size: 28px; }
+    .brand p { margin: 4px 0 0; color: var(--cream-dim); font-size: 14px; }
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      border: 0; cursor: pointer; border-radius: 999px;
+      padding: 11px 16px; font-weight: 600; font-size: 14px;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    .btn:active { transform: translateY(0); }
+    .btn-gold { background: linear-gradient(180deg, var(--gold2), var(--gold)); color: #2a1b0d; }
+    .btn-keto { background: linear-gradient(180deg, #8ee0d4, #4aa89c); color: #08221e; }
+    .btn-ghost { background: transparent; color: var(--cream); border: 1px solid var(--line); }
+    .btn-danger { background: #5a2b22; color: #f3cfc6; }
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr 360px;
+      gap: 18px;
+    }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--bg2));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      margin: 0; padding: 16px 18px 12px;
+      font-size: 16px; border-bottom: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .card .body { padding: 14px 16px 16px; }
+    .search {
+      width: 100%; padding: 10px 12px; border-radius: 12px;
+      border: 1px solid var(--line); background: #1c1612; color: var(--cream);
+      margin-bottom: 10px;
+    }
+    .cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .chip {
+      font-family: "Avenir Next", sans-serif; font-size: 11px;
+      padding: 5px 9px; border-radius: 999px; border: 1px solid var(--line);
+      background: #211914; color: var(--cream-dim); cursor: pointer;
+    }
+    .chip.on { background: #4a3424; color: var(--gold2); border-color: var(--gold); }
+    .ing-list { max-height: 520px; overflow: auto; display: grid; gap: 8px; }
+    .ing {
+      display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+      padding: 9px 10px; border-radius: 12px; background: #211914; border: 1px solid transparent;
+    }
+    .ing:hover { border-color: var(--gold); }
+    .ing .name { font-size: 14px; }
+    .ing .meta { font-size: 11px; color: var(--cream-dim); }
+    .ing button { padding: 6px 10px; font-size: 12px; }
+    .recipe-item {
+      display: grid; grid-template-columns: 1fr 92px auto; gap: 8px; align-items: center;
+      padding: 10px; border-radius: 12px; background: #211914; margin-bottom: 8px;
+    }
+    .recipe-item input {
+      width: 100%; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line);
+      background: #1c1612; color: var(--cream);
+    }
+    .tiny { font-size: 11px; color: var(--cream-dim); }
+    .scores { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .score {
+      background: #211914; border-radius: 14px; padding: 12px; text-align: center;
+      border: 1px solid var(--line);
+    }
+    .score b { display: block; font-size: 28px; line-height: 1.1; }
+    .score span { font-size: 11px; color: var(--cream-dim); letter-spacing: .04em; text-transform: uppercase; }
+    .bars { display: grid; gap: 9px; }
+    .bar-row { display: grid; grid-template-columns: 110px 1fr 36px; gap: 8px; align-items: center; font-size: 13px; }
+    .track { height: 10px; background: #1a1410; border-radius: 99px; overflow: hidden; border: 1px solid var(--line); }
+    .fill { height: 100%; width: 0%; border-radius: 99px; transition: width .35s ease; }
+    .note, .suggest, .impact {
+      background: #211914; border-radius: 12px; padding: 10px 12px; margin-top: 10px;
+      font-size: 13px; line-height: 1.45; color: #eadccb;
+    }
+    .suggest li { margin: 6px 0; }
+    .blend {
+      display: grid; gap: 8px;
+    }
+    .blend-row { display: grid; grid-template-columns: 1fr 80px; gap: 8px; }
+    .blend-row select, .blend-row input, select {
+      width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line);
+      background: #1c1612; color: var(--cream);
+    }
+    .empty { color: var(--cream-dim); font-size: 13px; padding: 12px 4px; }
+    .keto-box { margin-top: 10px; padding: 12px; border-radius: 14px; background: #172422; border: 1px solid #2f5a54; }
+    .pill { display: inline-block; padding: 3px 8px; border-radius: 99px; font-size: 11px; margin-right: 6px; }
+    .pill-good { background: #244028; color: #b6e2aa; }
+    .pill-mid { background: #3d3318; color: #efd08a; }
+    .pill-bad { background: #3d2018; color: #f0b0a0; }
+    footer { margin-top: 22px; color: var(--cream-dim); font-size: 12px; }
+    .recipe-card { margin-top: 18px; }
+    .recipe-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 22px; }
+    @media (max-width: 800px) { .recipe-grid { grid-template-columns: 1fr; } }
+    .recipe-card h3 { margin: 16px 0 8px; font-size: 15px; color: var(--gold2); }
+    .recipe-card ol { margin: 0; padding-left: 20px; }
+    .recipe-card li { margin: 8px 0; line-height: 1.45; }
+    .recipe-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; }
+    .ing-print { margin: 0; padding-left: 18px; }
+    .ing-print li { margin: 4px 0; }
+    .recipe-title { font-size: 26px; margin: 0 0 6px; }
+    .recipe-lead { color: var(--cream-dim); margin: 0 0 10px; }
+    .copy-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    @media print {
+      body { background: #fff; color: #222; }
+      header.hero, .layout > .card:not(.recipe-card), .hero-actions, .copy-row, footer { display: none !important; }
+      .layout { display: block; }
+      .recipe-card { display: block; background: #fff; border: 0; box-shadow: none; color: #222; }
+      .recipe-card h2, .recipe-title, .recipe-card h3 { color: #222; }
+    }
+    .modal-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none;
+      align-items: center; justify-content: center; padding: 20px; z-index: 20;
+    }
+    .modal {
+      width: min(640px, 100%); max-height: 86vh; overflow: auto;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">🎂</div>
+        <div>
+          <h1>Kageatelier</h1>
+          <p>Byg en kage, se live scoring, keto-venlighed og forventet krumme.</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-keto" id="btnRandom">Tilfældig keto-kage</button>
+        <button class="btn btn-gold" id="btnClassic">Klassisk chokolade</button>
+        <button class="btn btn-ghost" id="btnKnowledge">Vidensbase</button>
+        <button class="btn btn-danger" id="btnClear">Tøm opskrift</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <h2>Ingredienser</h2>
+        <div class="body">
+          <input class="search" id="search" placeholder="Søg ingrediens…" />
+          <div class="cats" id="cats"></div>
+          <div class="ing-list" id="catalog"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>
+          Din kage
+          <span class="tiny" id="totalWeight">0 g</span>
+        </h2>
+        <div class="body">
+          <div id="recipe" class="empty">Tilføj ingredienser fra venstre — eller tryk på en generator.</div>
+
+          <div class="keto-box" style="margin-top:16px">
+            <strong>Hjemmelavet mel</strong>
+            <p class="tiny">Blend nødder og fibre til dit eget “mel”. Appen opretter en ny ingrediens med beregnede egenskaber.</p>
+            <div class="blend" id="blender">
+              <div class="blend-row">
+                <select id="nut1"></select>
+                <input id="nut1g" type="number" min="0" value="80" />
+              </div>
+              <div class="blend-row">
+                <select id="nut2"></select>
+                <input id="nut2g" type="number" min="0" value="20" />
+              </div>
+              <div class="blend-row">
+                <select id="fiber"></select>
+                <input id="fiberg" type="number" min="0" value="5" />
+              </div>
+              <input id="blendName" class="search" style="margin:0" placeholder="Navn, f.eks. Hasselnød-psyllium mel" />
+              <button class="btn btn-gold" id="btnBlend">Blend og tilføj til kagen</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Live vurdering</h2>
+        <div class="body">
+          <div class="scores">
+            <div class="score"><span>Succes</span><b id="sSuccess">–</b></div>
+            <div class="score"><span>Smag</span><b id="sTaste">–</b></div>
+            <div class="score"><span>Keto</span><b id="sKeto">–</b></div>
+          </div>
+          <div id="ketoMeta" class="tiny"></div>
+          <div class="bars" id="bars"></div>
+          <div class="note" id="verdict">Tilføj ingredienser for at få en vurdering.</div>
+          <div class="suggest" id="suggest"></div>
+          <div class="impact" id="impacts"></div>
+        </div>
+      </section>
+    </div>
+    <section class="card recipe-card" id="recipeCard">
+      <h2>
+        Opskrift
+        <span class="tiny" id="recipeBadge">Tom</span>
+      </h2>
+      <div class="body">
+        <h3 class="recipe-title" id="recipeTitle">Din kage</h3>
+        <p class="recipe-lead" id="recipeLead">Tilføj ingredienser, så skrives en fuld opskrift med fremgangsmåde.</p>
+        <div class="recipe-meta" id="recipeMeta"></div>
+        <div class="recipe-grid">
+          <div>
+            <h3>Ingredienser</h3>
+            <div id="recipeIngredients" class="empty">Ingen ingredienser endnu.</div>
+          </div>
+          <div>
+            <h3>Fremgangsmåde</h3>
+            <div id="recipeMethod" class="empty">Metoden skrives, når kagen har indhold.</div>
+          </div>
+        </div>
+        <div class="copy-row">
+          <button class="btn btn-gold" id="btnCopy">Kopiér opskrift</button>
+          <button class="btn btn-ghost" id="btnPrint">Udskriv</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Modellen er heuristisk og baseret på klassisk kagekemi plus keto-bagning (mandelmel, kokosmel, æg-ratio, absorbans og bindemidler). Den erstatter ikke en testbagning.
+    </footer>
+  </div>
+
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <h2 style="margin-top:0">Vidensbase</h2>
+      <p>De mest succesfulde kager balancerer strukturbyggere (mel, æggehvide, bindemidler) med strukturbrydere (sukker/sødemiddel og fedt). I keto-kager erstattes hvedemel og sukker typisk med mandelmel + lidt kokosmel, erythritol/allulose og ekstra æg.</p>
+      <ul>
+        <li><b>Mandelmel:</b> fugtig, mør, nøddeagtig. Ca. 8–11 g net-kulhydrat/100 g. Smuldrer uden æg/bindemiddel.</li>
+        <li><b>Kokosmel:</b> 3–4× mere absorberende end mandelmel. Brug ca. ¼ mængde og mange flere æg. Ellers bliver kagen savsmuldstør.</li>
+        <li><b>Æg:</b> keto-kagens skelet. Kokosmel-kager kræver ofte 5–6 æg pr. 60 g kokosmel.</li>
+        <li><b>Erythritol:</b> 0 net-carb, kan give kølig eftersmag og tørrere krumme. Allulose holder bedre på fugt.</li>
+        <li><b>Xanthan / psyllium:</b> erstatter glutens “lim” og sænker smuldring.</li>
+      </ul>
+      <button class="btn btn-ghost" id="closeModal">Luk</button>
+    </div>
+  </div>
+
+<script>
+const CATS = ["Alle","Mel & blender","Sødt","Fedt","Æg & mejeri","Hævning","Smag","Bindemiddel","Frugt & pynt"];
+
+const DB = [
+  {id:"wheat", name:"Hvedemel", cat:"Mel & blender", net:73, fat:1, prot:10, fib:3, cal:364, abs:4, structure:2, moisture:-0.2, crumb:-1.2, sweet:0, rich:0, rise:0.6, flavor:0.2, keto:0.05,
+    impact:"Giver gluten-net og klassisk kagevolumen. Hæver succes i traditionel kage, men slår keto næsten i bund."},
+  {id:"cakeFlour", name:"Cakemel", cat:"Mel & blender", net:76, fat:1, prot:8, fib:2, cal:362, abs:3.6, structure:1.6, moisture:0.1, crumb:-1.4, sweet:0, rich:0, rise:0.8, flavor:0.2, keto:0.04,
+    impact:"Lavere protein end almindeligt mel = finere, mørere krumme. Stadig ikke keto."},
+  {id:"almond", name:"Mandelmel (blancheret)", cat:"Mel & blender", net:10, fat:50, prot:21, fib:10, cal:571, abs:2.2, structure:0.6, moisture:1.1, crumb:0.8, sweet:0.1, rich:1.4, rise:-0.2, flavor:0.8, keto:0.88,
+    impact:"Keto-grundmel. Fedtrig og mør, men uden gluten. Kræver æg og gerne lidt bindemiddel for ikke at smuldre."},
+  {id:"coconutFlour", name:"Kokosmel", cat:"Mel & blender", net:18, fat:15, prot:18, fib:35, cal:400, abs:9.2, structure:1.1, moisture:-1.6, crumb:0.4, sweet:0.2, rich:0.2, rise:0.2, flavor:0.6, keto:0.8,
+    impact:"Ekstremt absorberende. Brug ¼ af mandelmels mængde og mange æg/væske, ellers bliver kagen tør og sandet."},
+  {id:"hazelnut", name:"Hasselnødmel", cat:"Mel & blender", net:10, fat:61, prot:15, fib:10, cal:628, abs:2.1, structure:0.5, moisture:1.0, crumb:0.9, sweet:0.1, rich:1.5, flavor:1.3, rise:-0.2, keto:0.86,
+    impact:"Dyb nødde- og praliné-smag. God i chokoladekager. Samme smuldre-risiko som mandelmel."},
+  {id:"walnut", name:"Valnøddemel", cat:"Mel & blender", net:7, fat:65, prot:15, fib:7, cal:654, abs:2.0, structure:0.4, moisture:0.9, crumb:1.0, sweet:0, rich:1.3, flavor:1.2, rise:-0.3, keto:0.84,
+    impact:"Let bitter, kageagtig nøddeprofil. Bliver hurtigt ramt uden bindemiddel."},
+  {id:"pecan", name:"Pecannel", cat:"Mel & blender", net:4, fat:72, prot:9, fib:10, cal:691, abs:1.8, structure:0.3, moisture:1.2, crumb:1.1, sweet:0.1, rich:1.6, flavor:1.1, rise:-0.3, keto:0.9,
+    impact:"Meget fed og smøragtig. Fremragende i hummingbird-/gulerodslignende keto-kager."},
+  {id:"sunflower", name:"Solsikkemel", cat:"Mel & blender", net:12, fat:3, prot:45, fib:10, cal:326, abs:3.4, structure:0.9, moisture:-0.3, crumb:0.3, sweet:0, rich:0.2, flavor:0.5, rise:0.1, keto:0.78,
+    impact:"Nødd Mel-alternativ ved allergi. Kan misfarve grønligt med soda pga. klorofylreaktion."},
+  {id:"flax", name:"Formalet hørfrø", cat:"Mel & blender", net:2, fat:42, prot:18, fib:27, cal:534, abs:6.0, structure:0.8, moisture:0.4, crumb:-0.5, sweet:0, rich:0.4, flavor:0.3, rise:-0.1, keto:0.92,
+    impact:"Binder vand og giver lidt æggeerstatning. For meget giver slimet krumme."},
+  {id:"sugar", name:"Hvidt sukker", cat:"Sødt", net:100, fat:0, prot:0, fib:0, cal:387, abs:0.2, structure:-1.4, moisture:0.8, crumb:-0.6, sweet:2, rich:0.2, flavor:0.6, rise:0.5, keto:0.02,
+    impact:"Søder, mørner og holder på fugt. Karamelliserer. Dræber keto-scoren."},
+  {id:"brownSugar", name:"Brunt sukker", cat:"Sødt", net:98, fat:0, prot:0, fib:0, cal:380, abs:0.3, structure:-1.3, moisture:1.0, crumb:-0.5, sweet:1.9, rich:0.5, flavor:0.9, rise:0.4, keto:0.02,
+    impact:"Melasse giver dybde og ekstra fugt. Stadig ikke keto."},
+  {id:"erythritol", name:"Erythritol", cat:"Sødt", net:0, fat:0, prot:0, fib:0, cal:20, abs:0.1, structure:-0.7, moisture:-0.6, crumb:0.4, sweet:1.6, rich:0, flavor:0.3, rise:0.2, keto:0.98,
+    impact:"0 net-carb. Kan krystallisere og give kølig eftersmag. Tørrere krumme end sukker."},
+  {id:"allulose", name:"Allulose", cat:"Sødt", net:0, fat:0, prot:0, fib:0, cal:40, abs:0.2, structure:-0.9, moisture:0.7, crumb:-0.3, sweet:1.5, rich:0.1, flavor:0.5, rise:0.3, keto:0.96,
+    impact:"Bager mere som sukker og holder fugt bedre end erythritol. Meget keto-venlig."},
+  {id:"monk", name:"Monk fruit-blend", cat:"Sødt", net:1, fat:0, prot:0, fib:0, cal:20, abs:0.1, structure:-0.7, moisture:-0.2, crumb:0.2, sweet:1.7, rich:0, flavor:0.4, rise:0.2, keto:0.97,
+    impact:"Høj sødme uden sukker. Blandinger med erythritol arver dennes tørhed."},
+  {id:"butter", name:"Smør", cat:"Fedt", net:0.1, fat:81, prot:0.9, fib:0, cal:717, abs:0, structure:-0.8, moisture:0.9, crumb:-0.4, sweet:0, rich:2, flavor:1.4, rise:0.6, keto:0.95,
+    impact:"Smag, luft ved creaming og mør krumme. Guldstandarden i både klassisk og keto."},
+  {id:"oil", name:"Neutral olie", cat:"Fedt", net:0, fat:100, prot:0, fib:0, cal:884, abs:0, structure:-1.0, moisture:1.5, crumb:-0.2, sweet:0, rich:1.2, flavor:0.1, rise:0.1, keto:0.97,
+    impact:"Giver længerevarende fugt end smør. Typisk i gulerods- og red velvet-kager."},
+  {id:"cocoaButter", name:"Kokosolie", cat:"Fedt", net:0, fat:99, prot:0, fib:0, cal:862, abs:0, structure:-0.9, moisture:1.2, crumb:0.1, sweet:0, rich:1.3, flavor:0.5, rise:0.1, keto:0.97,
+    impact:"Keto-fedt med let kokospræg. Fast ved kølig servering."},
+  {id:"egg", name:"Æg (hele)", cat:"Æg & mejeri", net:0.7, fat:10, prot:13, fib:0, cal:143, abs:0, structure:1.8, moisture:0.8, crumb:-1.0, sweet:0, rich:1.0, flavor:0.5, rise:1.4, keto:0.94,
+    impact:"Struktur, emulgering, fugt og hævning. Uundværlig i keto, især med kokosmel."},
+  {id:"eggWhite", name:"Æggehvide", cat:"Æg & mejeri", net:0.7, fat:0.2, prot:11, fib:0, cal:52, abs:0, structure:1.6, moisture:0.2, crumb:-0.8, sweet:0, rich:-0.2, flavor:0.1, rise:2, keto:0.95,
+    impact:"Luft og skelet. Basis i angel food / pavlova-agtige kager."},
+  {id:"eggYolk", name:"Æggeblomme", cat:"Æg & mejeri", net:0.6, fat:27, prot:16, fib:0, cal:322, abs:0, structure:0.7, moisture:0.6, crumb:-0.6, sweet:0, rich:1.6, flavor:0.8, rise:0.2, keto:0.93,
+    impact:"Emulgator og fløjlsagtig krumme. Øger rigdom uden kulhydrat."},
+  {id:"creamCheese", name:"Flødeost", cat:"Æg & mejeri", net:4, fat:34, prot:6, fib:0, cal:342, abs:0.2, structure:0.4, moisture:0.7, crumb:-0.5, sweet:0.1, rich:1.7, flavor:1.1, rise:-0.2, keto:0.82,
+    impact:"Syrlig kontrast og cremethed. Driver popularitet i red velvet, gulerod og cheesecake."},
+  {id:"heavyCream", name:"Piskefløde", cat:"Æg & mejeri", net:3, fat:36, prot:2, fib:0, cal:340, abs:0, structure:-0.2, moisture:1.1, crumb:-0.3, sweet:0.1, rich:1.5, flavor:0.6, rise:0.1, keto:0.86,
+    impact:"Fugt og luksus. God i keto-ganache og tres-leches-agtige varianter i små mængder."},
+  {id:"sourCream", name:"Crème fraîche / sour cream", cat:"Æg & mejeri", net:3, fat:20, prot:3, fib:0, cal:198, abs:0, structure:0.1, moisture:0.9, crumb:-0.4, sweet:0, rich:1.1, flavor:0.8, rise:0.2, keto:0.8,
+    impact:"Syre mørner krummen og løfter chokolade- og vaniljesmag."},
+  {id:"milk", name:"Sødmælk", cat:"Æg & mejeri", net:5, fat:3.5, prot:3.4, fib:0, cal:64, abs:0, structure:0, moisture:1.0, crumb:0, sweet:0.2, rich:0.2, flavor:0.2, rise:0.4, keto:0.35,
+    impact:"Hydrering og damp-hævning. Moderate kulhydrater — brug mandelmælk for keto."},
+  {id:"almondMilk", name:"Usødet mandelmælk", cat:"Æg & mejeri", net:0.4, fat:1.1, prot:0.4, fib:0.2, cal:13, abs:0, structure:0, moisture:0.9, crumb:0.1, sweet:0, rich:0, flavor:0.2, rise:0.3, keto:0.93,
+    impact:"Lav-carb væske. Fortynder uden at slå keto ihjel."},
+  {id:"buttermilk", name:"Kærnemælk", cat:"Æg & mejeri", net:4.8, fat:1, prot:3, fib:0, cal:40, abs:0, structure:0.1, moisture:1.0, crumb:-0.3, sweet:0.1, rich:0.2, flavor:0.7, rise:0.6, keto:0.32,
+    impact:"Syre aktiverer soda og giver red velvet-mørhed. Ikke ideel til streng keto."},
+  {id:"bp", name:"Bagepulver", cat:"Hævning", net:28, fat:0, prot:0, fib:0, cal:53, abs:0, structure:0.2, moisture:0, crumb:-0.2, sweet:0, rich:0, flavor:0, rise:2, keto:0.7,
+    impact:"Dobbeltvirkende CO₂. Små mængder er nok. For meget = bitter og kollaps."},
+  {id:"soda", name:"Natron", cat:"Hævning", net:0, fat:0, prot:0, fib:0, cal:0, abs:0, structure:0.1, moisture:0, crumb:-0.1, sweet:0, rich:0, flavor:-0.2, rise:1.8, keto:0.9,
+    impact:"Kræver syre. Giver rum og mørkere kakao-farve. Uundværlig i red velvet-logik."},
+  {id:"tartar", name:"Cream of tartar", cat:"Hævning", net:62, fat:0, prot:0, fib:0, cal:258, abs:0, structure:0.4, moisture:0, crumb:-0.3, sweet:0, rich:0, flavor:0, rise:0.8, keto:0.6,
+    impact:"Stabiliserer piskede hvider. Bruges i små teskefulde."},
+  {id:"vanilla", name:"Vaniljeekstrakt", cat:"Smag", net:13, fat:0, prot:0, fib:0, cal:288, abs:0, structure:0, moisture:0, crumb:0, sweet:0.2, rich:0.2, flavor:2, rise:0, keto:0.75,
+    impact:"Løfter næsten alle kager. Lille mængde, stor effekt på smags-score."},
+  {id:"cocoa", name:"Kakao, usødet", cat:"Smag", net:12, fat:14, prot:20, fib:33, cal:228, abs:3.2, structure:0.3, moisture:-0.5, crumb:0.2, sweet:0, rich:1.2, flavor:2, rise:0.1, keto:0.78,
+    impact:"Intens chokoladesmag og farve. Tørrer lidt — kompensér med fedt eller væske."},
+  {id:"chocolate", name:"Mørk chokolade 85%", cat:"Smag", net:14, fat:46, prot:11, fib:11, cal:598, abs:0.4, structure:0.2, moisture:0.4, crumb:-0.2, sweet:0.6, rich:1.8, flavor:2, rise:0, keto:0.7,
+    impact:"Luksus, smeltepunkt og dybde. Bedre end mælkechokolade til keto."},
+  {id:"cinnamon", name:"Kanel", cat:"Smag", net:27, fat:1, prot:4, fib:53, cal:247, abs:0.3, structure:0, moisture:0, crumb:0, sweet:0.2, rich:0.2, flavor:1.3, rise:0, keto:0.7,
+    impact:"Varme og “bagt” aroma. Lille dosis. God i gulerods-/kaffekage-profiler."},
+  {id:"lemon", name:"Citron (saft+skal)", cat:"Smag", net:3, fat:0.3, prot:1, fib:3, cal:29, abs:0, structure:0, moisture:0.4, crumb:0, sweet:0, rich:0, flavor:1.5, rise:0.3, keto:0.72,
+    impact:"Syre og friskhed. Skærer igennem fedt og sødemiddel. God i keto-kager der ellers smager flade."},
+  {id:"salt", name:"Salt", cat:"Smag", net:0, fat:0, prot:0, fib:0, cal:0, abs:0, structure:0.2, moisture:0, crumb:0, sweet:0.1, rich:0.2, flavor:1.2, rise:0, keto:1,
+    impact:"Skærper sødme og forhindrer flad smag. Næsten obligatorisk."},
+  {id:"espresso", name:"Espresso / kaffe", cat:"Smag", net:0, fat:0, prot:0.1, fib:0, cal:2, abs:0, structure:0, moisture:0.3, crumb:0, sweet:0, rich:0.3, flavor:1.4, rise:0.1, keto:0.95,
+    impact:"Forstærker chokolade uden at smage af kaffe i små mængder."},
+  {id:"xanthan", name:"Xanthangummi", cat:"Bindemiddel", net:0, fat:0, prot:0, fib:77, cal:200, abs:8, structure:1.6, moisture:0.3, crumb:-1.8, sweet:0, rich:0, flavor:0, rise:0.2, keto:0.95,
+    impact:"Gluten-erstatning. 1–3 g er nok. For meget bliver slimt."},
+  {id:"psyllium", name:"Psyllium-skaller", cat:"Bindemiddel", net:1, fat:0.5, prot:1.5, fib:80, cal:200, abs:8.5, structure:1.5, moisture:0.5, crumb:-1.6, sweet:0, rich:0, flavor:-0.1, rise:0.3, keto:0.94,
+    impact:"Binder og giver brød-/kageagtig bid. Hydrér kort. For meget = gelé og lilla skær."},
+  {id:"carrot", name:"Gulerod, revet", cat:"Frugt & pynt", net:7, fat:0.2, prot:1, fib:3, cal:41, abs:1, structure:0.2, moisture:1.1, crumb:0.2, sweet:0.5, rich:0.1, flavor:0.7, rise:0, keto:0.45,
+    impact:"Naturlig sødme og fugt. Klassisk i gulerodskage, men hæver net-carb."},
+  {id:"banana", name:"Banan, moset", cat:"Frugt & pynt", net:20, fat:0.3, prot:1.1, fib:2.6, cal:89, abs:0.8, structure:0.3, moisture:1.3, crumb:-0.2, sweet:1.2, rich:0.2, flavor:1.1, rise:0.2, keto:0.12,
+    impact:"Fugt og sødme, men kulhydrat-tung. Dårlig til keto."},
+  {id:"berries", name:"Bær (hindbær/blåbær)", cat:"Frugt & pynt", net:6, fat:0.3, prot:1, fib:4, cal:43, abs:0.4, structure:0, moisture:0.6, crumb:0.2, sweet:0.4, rich:0, flavor:1.2, rise:0, keto:0.55,
+    impact:"Syre og farve. Brug sparsomt i keto. For mange bær gør midten våd."},
+  {id:"pecans", name:"Pekannødder, hakket", cat:"Frugt & pynt", net:4, fat:72, prot:9, fib:10, cal:691, abs:0.5, structure:0.1, moisture:0.3, crumb:0.6, sweet:0.1, rich:1.2, flavor:1.0, rise:0, keto:0.9,
+    impact:"Knas og fedme. Løfter både smag og keto-fedtandel."},
+  {id:"walnutsTop", name:"Valnødder, hakket", cat:"Frugt & pynt", net:7, fat:65, prot:15, fib:7, cal:654, abs:0.5, structure:0.1, moisture:0.2, crumb:0.6, sweet:0, rich:1.0, flavor:1.0, rise:0, keto:0.85,
+    impact:"Bitter-sød kontrast. God i gulerods- og kaffekage."}
+];
+
+const NUTS = [
+  {id:"almondsRaw", name:"Mandler", mapsTo:"almond"},
+  {id:"hazelnutsRaw", name:"Hasselnødder", mapsTo:"hazelnut"},
+  {id:"walnutsRaw", name:"Valnødder", mapsTo:"walnut"},
+  {id:"pecansRaw", name:"Pekannødder", mapsTo:"pecan"},
+  {id:"coconutRaw", name:"Tørret kokos", mapsTo:"coconutFlour"},
+  {id:"sunflowerRaw", name:"Solsikkekerner", mapsTo:"sunflower"}
+];
+const FIBERS = [
+  {id:"none", name:"Ingen extra fiber", mapsTo:null},
+  {id:"psyllium", name:"Psyllium", mapsTo:"psyllium"},
+  {id:"flax", name:"Hørfrø", mapsTo:"flax"},
+  {id:"xanthan", name:"Xanthan", mapsTo:"xanthan"}
+];
+
+let recipe = []; // {id, grams, custom?}
+let customCount = 0;
+let activeCat = "Alle";
+let cakeName = "";
+let lastTextRecipe = "";
+
+const $ = (id) => document.getElementById(id);
+
+function renderCats() {
+  $("cats").innerHTML = CATS.map(c =>
+    `<button class="chip ${c===activeCat?'on':''}" data-cat="${c}">${c}</button>`
+  ).join("");
+  $("cats").querySelectorAll(".chip").forEach(b => b.onclick = () => {
+    activeCat = b.dataset.cat; renderCats(); renderCatalog();
+  });
+}
+
+function renderCatalog() {
+  const q = $("search").value.toLowerCase();
+  const items = DB.filter(i =>
+    (activeCat==="Alle" || i.cat===activeCat) && i.name.toLowerCase().includes(q)
+  );
+  $("catalog").innerHTML = items.map(i => `
+    <div class="ing">
+      <div>
+        <div class="name">${i.name}</div>
+        <div class="meta">${i.cat} · ${i.net} g net-carb/100g · keto ${(i.keto*100)|0}%</div>
+      </div>
+      <button class="btn btn-gold" data-add="${i.id}">+ 50 g</button>
+    </div>
+  `).join("");
+  $("catalog").querySelectorAll("[data-add]").forEach(b => b.onclick = () => addIng(b.dataset.add, 50));
+}
+
+function addIng(id, grams) {
+  const existing = recipe.find(r => r.id===id);
+  if (existing) existing.grams = Math.round((existing.grams + grams)*10)/10;
+  else recipe.push({id, grams});
+  renderRecipe(); analyze();
+}
+
+function removeIng(id) {
+  recipe = recipe.filter(r => r.id !== id);
+  renderRecipe(); analyze();
+}
+
+function renderRecipe() {
+  if (!recipe.length) {
+    $("recipe").innerHTML = `<div class="empty">Tilføj ingredienser fra venstre — eller tryk på en generator.</div>`;
+    $("totalWeight").textContent = "0 g";
+    return;
+  }
+  const total = recipe.reduce((s,r)=>s+r.grams,0);
+  $("totalWeight").textContent = Math.round(total) + " g";
+  $("recipe").innerHTML = recipe.map(r => {
+    const item = DB.find(i=>i.id===r.id);
+    return `<div class="recipe-item">
+      <div>
+        <div>${item.name}</div>
+        <div class="tiny">${item.impact.slice(0,90)}…</div>
+      </div>
+      <input type="number" min="0" step="1" value="${r.grams}" data-g="${r.id}" />
+      <button class="btn btn-ghost" data-del="${r.id}">✕</button>
+    </div>`;
+  }).join("");
+  $("recipe").querySelectorAll("[data-g]").forEach(inp => inp.onchange = () => {
+    const row = recipe.find(r=>r.id===inp.dataset.g);
+    row.grams = Math.max(0, Number(inp.value)||0);
+    analyze();
+    $("totalWeight").textContent = Math.round(recipe.reduce((s,r)=>s+r.grams,0)) + " g";
+  });
+  $("recipe").querySelectorAll("[data-del]").forEach(b => b.onclick = () => removeIng(b.dataset.del));
+}
+
+function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+function avg(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0; }
+
+function analyze() {
+  const barsEl = $("bars");
+  if (!recipe.length) {
+    $("sSuccess").textContent = "–";
+    $("sTaste").textContent = "–";
+    $("sKeto").textContent = "–";
+    $("ketoMeta").textContent = "";
+    barsEl.innerHTML = "";
+    $("verdict").textContent = "Tilføj ingredienser for at få en vurdering.";
+    $("suggest").innerHTML = "";
+    $("impacts").innerHTML = "";
+    writeRecipe(null);
+    return;
+  }
+
+  const rows = recipe.map(r => ({...DB.find(i=>i.id===r.id), grams:r.grams})).filter(x=>x.grams>0);
+  const total = rows.reduce((s,r)=>s+r.grams,0) || 1;
+  const w = (key) => rows.reduce((s,r)=> s + r.grams * (r[key]||0), 0) / total;
+
+  const netTotal = rows.reduce((s,r)=> s + r.grams * r.net/100, 0);
+  const fatTotal = rows.reduce((s,r)=> s + r.grams * r.fat/100, 0);
+  const protTotal = rows.reduce((s,r)=> s + r.grams * r.prot/100, 0);
+  const netPer100 = netTotal / total * 100;
+  const servings = 8;
+  const netPerSlice = netTotal / servings;
+
+  const absLoad = rows.reduce((s,r)=> s + r.grams * r.abs, 0);
+  const wetIds = new Set(["egg","eggWhite","eggYolk","milk","almondMilk","buttermilk","heavyCream","sourCream","oil","butter","cocoaButter","lemon","banana","carrot","berries"]);
+  const wetG = rows.filter(r=>wetIds.has(r.id) || r.cat==="Fedt" || r.cat==="Æg & mejeri").reduce((s,r)=>s+r.grams,0);
+  const dryG = total - wetG;
+  const hydration = wetG / Math.max(30, dryG);
+  const neededHydration = clamp(absLoad / Math.max(80, dryG) * 0.35, 0.35, 2.2);
+  const hydRatio = hydration / neededHydration;
+
+  const eggsG = rows.filter(r=>["egg","eggWhite","eggYolk"].includes(r.id)).reduce((s,r)=>s+r.grams,0);
+  const flourG = rows.filter(r=>r.cat==="Mel & blender").reduce((s,r)=>s+r.grams,0);
+  const sweetG = rows.filter(r=>r.cat==="Sødt").reduce((s,r)=>s+r.grams,0);
+  const fatG = rows.filter(r=>r.cat==="Fedt" || ["eggYolk","creamCheese","heavyCream"].includes(r.id)).reduce((s,r)=>s+r.grams,0);
+  const binderG = rows.filter(r=>r.cat==="Bindemiddel").reduce((s,r)=>s+r.grams,0);
+  const flavorG = rows.filter(r=>["vanilla","cocoa","chocolate","cinnamon","lemon","espresso","salt"].includes(r.id)).reduce((s,r)=>s+r.grams,0);
+  const wheatG = rows.filter(r=>["wheat","cakeFlour","sugar","brownSugar","banana","milk","buttermilk"].includes(r.id)).reduce((s,r)=>s+r.grams,0);
+  const cocoG = rows.filter(r=>r.id==="coconutFlour").reduce((s,r)=>s+r.grams,0);
+  const leavenG = rows.filter(r=>r.cat==="Hævning").reduce((s,r)=>s+r.grams,0);
+
+  // property scores 0-100
+  const moisture = clamp(50 + w("moisture")*18 + (hydRatio-1)*25 + (fatG/total)*20 - (cocoG/total)*35, 4, 96);
+  const dryness = 100 - moisture;
+  const crumbliness = clamp(40 + w("crumb")*22 - binderG*8 - eggsG/total*40 + (flourG && eggsG/flourG < 0.35 ? 18 : 0), 4, 96);
+  const density = clamp(55 - w("rise")*12 - eggsG/total*25 + fatG/total*20 + (cocoG?8:0) - leavenG*3, 8, 94);
+  const sweetness = clamp(w("sweet")*38 + sweetG/total*90, 2, 98);
+  const rise = clamp(20 + w("rise")*22 + leavenG*6 + eggsG/total*40 - density*0.15, 4, 96);
+  const richness = clamp(15 + w("rich")*22 + fatG/total*55, 4, 98);
+  const structure = clamp(20 + w("structure")*20 + eggsG/total*35 + binderG*10 + (wheatG?15:0) - crumbliness*0.15, 5, 96);
+  const flavor = clamp(10 + w("flavor")*28 + (flavorG>0?18:0) + Math.min(22, sweetness*0.2) + Math.min(15, richness*0.15), 5, 98);
+
+  // success
+  let success = 40;
+  if (flourG + eggsG > 40) success += 10;
+  if (sweetG > 8 || rows.some(r=>r.cat==="Sødt")) success += 8;
+  if (fatG > 15) success += 8;
+  if (flavorG > 0) success += 8;
+  if (hydRatio > 0.7 && hydRatio < 1.45) success += 14;
+  else success -= Math.min(22, Math.abs(hydRatio-1)*20);
+  if (structure > 45) success += 8;
+  if (cocoG > 20 && eggsG < cocoG * 1.6) success -= 18;
+  if (binderG > 12) success -= 8;
+  if (leavenG > 18) success -= 6;
+  if (rows.length < 3) success -= 10;
+  if (sweetness < 12 && !rows.some(r=>r.id==="cocoa"||r.id==="chocolate"||r.id==="lemon")) success -= 6;
+  success = clamp(Math.round(success + (flavor-50)*0.12 + (moisture-50)*0.08), 8, 97);
+
+  const taste = clamp(Math.round(flavor*0.45 + richness*0.2 + (100-Math.abs(sweetness-62))*0.15 + (100-dryness)*0.12 + (100-crumbliness)*0.08), 8, 98);
+
+  let keto = clamp(Math.round(100 - netPer100*3.2 - (wheatG/total)*70), 1, 99);
+  keto = Math.round(keto * (0.35 + 0.65 * w("keto")));
+  if (netPerSlice > 15) keto = Math.min(keto, 35);
+  if (netPerSlice < 4 && wheatG===0) keto = Math.max(keto, 78);
+
+  $("sSuccess").textContent = success;
+  $("sTaste").textContent = taste;
+  $("sKeto").textContent = keto;
+  $("sSuccess").style.color = success>72? "var(--good)" : success>50? "var(--warn)" : "var(--bad)";
+  $("sTaste").style.color = taste>72? "var(--good)" : taste>50? "var(--warn)" : "var(--bad)";
+  $("sKeto").style.color = keto>75? "var(--keto)" : keto>45? "var(--warn)" : "var(--bad)";
+
+  const ketoLabel = keto>=80 ? "Meget keto-venlig" : keto>=60 ? "Acceptabel keto" : keto>=40 ? "Lav-carb-ish" : "Ikke keto";
+  $("ketoMeta").innerHTML = `<span class="pill ${keto>=80?'pill-good':keto>=50?'pill-mid':'pill-bad'}">${ketoLabel}</span>
+    Ca. <b>${netPer100.toFixed(1)} g</b> net-carb / 100 g · <b>${netPerSlice.toFixed(1)} g</b> / skive (8 stk) · fedt ${fatTotal.toFixed(0)} g · protein ${protTotal.toFixed(0)} g`;
+
+  const props = [
+    ["Tørhed", dryness, dryness>65?"var(--bad)":"var(--gold)"],
+    ["Smuldring", crumbliness, crumbliness>65?"var(--bad)":"var(--gold)"],
+    ["Fugtighed", moisture, "var(--keto)"],
+    ["Densitet", density, "var(--cocoa)"],
+    ["Sødme", sweetness, "var(--gold2)"],
+    ["Hævning", rise, "var(--good)"],
+    ["Rigdom", richness, "#c9846a"],
+    ["Struktur", structure, "#8fb7e8"]
+  ];
+  barsEl.innerHTML = props.map(([n,v,c]) => `
+    <div class="bar-row"><div>${n}</div><div class="track"><div class="fill" style="width:${v}%;background:${c}"></div></div><div>${Math.round(v)}</div></div>
+  `).join("");
+
+  const notes = [];
+  if (hydRatio < 0.7) notes.push("Dejen ser undervandetet ud — forvent tør og smuldrende kage.");
+  if (hydRatio > 1.5) notes.push("Meget våd balance — risiko for klæg midte og dårlig hævning.");
+  if (cocoG && eggsG < cocoG*1.5) notes.push("Kokosmel uden nok æg/væske giver savsmuld. Tommelfinger: mange æg pr. 30–60 g kokosmel.");
+  if (flourG && eggsG/Math.max(flourG,1) < 0.3 && binderG < 1) notes.push("Lav æg-til-mel-ratio. Nøddemel smuldrer uden extra æg eller xanthan/psyllium.");
+  if (sweetness < 20) notes.push("Lav sødme. De fleste “velsmagende” kager ligger midt-højt på sødme eller kompenserer med chokolade/syre.");
+  if (sweetness > 85) notes.push("Meget sød — kan dække nuancer og gøre krummen klæg.");
+  if (wheatG > 30) notes.push("Hvedemel/sukker/banan trækker keto-scoren kraftigt ned.");
+  if (rows.some(r=>r.id==="erythritol") && !rows.some(r=>r.id==="allulose")) notes.push("Erythritol alene kan give kølig eftersmag og tørrere bid. Allulose eller extra fedt hjælper.");
+  if (leavenG === 0 && eggsG < 80) notes.push("Ingen hævemiddel og få æg: forvent tæt kage (kan være lækkert som kladdkaka).");
+  if (flavorG === 0) notes.push("Mangler smagsgiver. Vanilje, salt, kakao eller citron løfter næsten alt.");
+  if (!notes.length) notes.push("Balancen ser fornuftig ud. Små justeringer i fedt, æg og smag kan stadig finpudse krummen.");
+
+  $("verdict").innerHTML = `<b>Forventet resultat:</b> ${
+    dryness>70 ? "tør " : moisture>70 ? "saftig " : "moderat fugtig "
+  }${crumbliness>68 ? "og smuldrende " : structure>65 ? "med holdbar krumme " : ""}${
+    density>68 ? "tæt " : rise>65 ? "luftig " : ""
+  }kage med ${sweetness>60?"tydelig":"afdæmpet"} sødme og ${richness>60?"høj":"let"} rigdom.<br><br>${notes.join(" ")}`;
+
+  // suggestions
+  const have = new Set(rows.map(r=>r.id));
+  const ideas = [];
+  if (!have.has("salt")) ideas.push(["Salt", "Skærper sødmen og får kagen til at smage færdig. Start med 1–2 g."]);
+  if (!have.has("vanilla") && !have.has("cocoa") && !have.has("lemon")) ideas.push(["Vanilje eller kakao", "Uden en klar smagsakse scorer kagen lavt på 'velsmagende'."]);
+  if (crumbliness>62 && binderG<1 && !have.has("xanthan")) ideas.push(["Xanthan (1–2 g)", "Sænker smuldring markant i nødde-mel-kager."]);
+  if (cocoG && hydRatio<1) ideas.push(["Ekstra æg eller mandelmælk", "Kokosmel drikker væske. +1 æg pr. 20–25 g kokosmel er et godt udgangspunkt."]);
+  if (have.has("cocoa") && !have.has("espresso") && !have.has("butter")) ideas.push(["Espresso eller mere fedt", "Kakao tørrer og bliver flad uden fedt eller kaffe-forstærkning."]);
+  if (keto>70 && sweetness<35 && !have.has("erythritol") && !have.has("allulose") && !have.has("monk")) ideas.push(["Allulose eller monk fruit", "Keto-sødme uden at smadre net-carb."]);
+  if (have.has("almond") && !have.has("coconutFlour") && structure<50) ideas.push(["Lidt kokosmel (10–20% af melet)", "Giver bid og suger overskydende fedt, så kagen ikke bliver fedtet."]);
+  if (have.has("creamCheese") && !have.has("lemon")) ideas.push(["Citron", "Syre klæder flødeost og løfter en ellers tung kage."]);
+  if (success>60 && keto<45) ideas.push(["Skift sukker→allulose og hvedemel→mandel+kokos", "Beholder kageidéen, men flytter den ind i keto-zonen."]);
+  if (!ideas.length) ideas.push(["Ristede pekannødder eller bær", "Tekstur og aroma uden at ændre strukturen voldsomt."]);
+
+  $("suggest").innerHTML = `<b>Forslag lige nu</b><ul>${ideas.map(([t,d])=>`<li><b>${t}:</b> ${d}</li>`).join("")}</ul>`;
+
+  $("impacts").innerHTML = `<b>Hver ingrediens’ effekt i netop denne opskrift</b>` + rows.map(r => {
+    const share = r.grams/total;
+    const roles = [];
+    if (r.structure>0.5) roles.push("bygger struktur");
+    if (r.structure<0) roles.push("mørner / forkorter struktur");
+    if (r.moisture>0.4) roles.push("øger fugt");
+    if (r.moisture<-0.4) roles.push("tørrer dejen");
+    if (r.crumb>0.4) roles.push("øger smuldring");
+    if (r.crumb<-0.4) roles.push("binder krummen");
+    if (r.sweet>0.8) roles.push("søder");
+    if (r.rise>0.8) roles.push("giver hævning");
+    if (r.flavor>0.8) roles.push("driver smagen");
+    if (r.keto<0.3) roles.push("sænker keto-score");
+    return `<div style="margin-top:8px"><b>${r.name} (${r.grams} g, ${(share*100).toFixed(0)}%)</b><br>${r.impact} ${roles.length? "Her: "+roles.join(", ")+"." : ""}</div>`;
+  }).join("");
+
+  writeRecipe({rows, total, netPer100, netPerSlice, fatTotal, protTotal, hydRatio, eggsG, flourG, cocoG, binderG, leavenG, wheatG, sweetness, moisture, crumbliness, density, rise, richness, structure, success, taste, keto});
+}
+
+function prettyAmount(id, g) {
+  const n = Math.round(g);
+  const extras = [];
+  if (id === "egg") extras.push(`ca. ${(g/50).toFixed(1).replace(".",",")} store æg`);
+  if (id === "eggWhite") extras.push(`ca. ${Math.round(g/30)} hvider`);
+  if (id === "eggYolk") extras.push(`ca. ${Math.round(g/18)} blommer`);
+  if (["butter","oil","cocoaButter"].includes(id)) extras.push(`ca. ${(g/14).toFixed(1).replace(".",",")} spsk`);
+  if (["vanilla","bp","soda"].includes(id)) extras.push(`ca. ${(g/4).toFixed(1).replace(".",",")} tsk`);
+  if (id === "salt") extras.push(g <= 3 ? "en god knivspids til ½ tsk" : `ca. ${(g/6).toFixed(1).replace(".",",")} tsk`);
+  if (id === "cinnamon") extras.push(`ca. ${(g/2.6).toFixed(1).replace(".",",")} tsk`);
+  if (id === "xanthan" || id === "psyllium") extras.push(g <= 3 ? "1 tsk" : `ca. ${(g/3).toFixed(1).replace(".",",")} tsk`);
+  if (id === "tartar") extras.push(`ca. ${(g/3).toFixed(1).replace(".",",")} tsk`);
+  return extras.length ? `${n} g (${extras[0]})` : `${n} g`;
+}
+
+function inferTitle(rows) {
+  if (cakeName) return cakeName;
+  const ids = new Set(rows.map(r => r.id));
+  const ketoish = !ids.has("wheat") && !ids.has("cakeFlour") && !ids.has("sugar") && !ids.has("brownSugar") && !ids.has("banana");
+  const prefix = ketoish ? "Keto " : "";
+  if (ids.has("cocoa") || ids.has("chocolate")) {
+    if (!rows.some(r => r.cat === "Mel & blender") || rows.filter(r=>r.cat==="Mel & blender").reduce((s,r)=>s+r.grams,0) < 50)
+      return prefix + "kladdkaka";
+    return prefix + "chokoladekage";
+  }
+  if (ids.has("creamCheese") && ids.has("lemon")) return prefix + "citron-cheesecakekage";
+  if (ids.has("creamCheese")) return prefix + "flødeostekage";
+  if (ids.has("carrot")) return prefix + "gulerodskage";
+  if (ids.has("cinnamon") && (ids.has("pecan") || ids.has("pecans"))) return prefix + "kanel-pekankage";
+  if (ids.has("hazelnut")) return prefix + "hasselnøddekage";
+  if (ids.has("lemon")) return prefix + "citronekage";
+  if (ids.has("vanilla")) return prefix + "vaniljekage";
+  return prefix + "hjemmebagt kage";
+}
+
+function writeRecipe(ctx) {
+  if (!ctx) {
+    $("recipeTitle").textContent = "Din kage";
+    $("recipeLead").textContent = "Tilføj ingredienser, så skrives en fuld opskrift med fremgangsmåde.";
+    $("recipeMeta").innerHTML = "";
+    $("recipeIngredients").innerHTML = `<div class="empty">Ingen ingredienser endnu.</div>`;
+    $("recipeMethod").innerHTML = `<div class="empty">Metoden skrives, når kagen har indhold.</div>`;
+    $("recipeBadge").textContent = "Tom";
+    lastTextRecipe = "";
+    return;
+  }
+  const {rows, total, netPer100, netPerSlice, fatTotal, protTotal, hydRatio, eggsG, flourG, cocoG, binderG, leavenG, wheatG, sweetness, moisture, crumbliness, density, rise, richness, success, taste, keto} = ctx;
+  const ids = new Set(rows.map(r => r.id));
+  const title = inferTitle(rows);
+  const ketoish = keto >= 60 && wheatG === 0;
+  const form = total < 450 ? "en lille form (15–18 cm) eller 6–8 muffins" : total < 900 ? "en springform på 20–22 cm" : "en 24 cm form eller to 18 cm lagkageforme";
+  const temp = ids.has("chocolate") && flourG < 60 ? "170" : ketoish ? "175" : "175–180";
+  let minutes = 28;
+  if (total > 900) minutes = 40;
+  else if (total > 650) minutes = 34;
+  if (cocoG > 20) minutes += 4;
+  if (ids.has("chocolate") && flourG < 60) minutes = Math.max(18, minutes - 8);
+  if (density > 70) minutes += 4;
+
+  const groups = {};
+  rows.forEach(r => {
+    const g = r.cat;
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(r);
+  });
+  const order = ["Mel & blender","Sødt","Fedt","Æg & mejeri","Hævning","Smag","Bindemiddel","Frugt & pynt"];
+  let ingHtml = "";
+  let ingText = "";
+  order.forEach(g => {
+    if (!groups[g]) return;
+    ingHtml += `<div class="tiny" style="margin:10px 0 4px;color:var(--gold2)">${g}</div><ul class="ing-print">`;
+    ingText += `\n${g}\n`;
+    groups[g].sort((a,b)=>b.grams-a.grams).forEach(r => {
+      const amt = prettyAmount(r.id, r.grams);
+      ingHtml += `<li>${amt} ${r.name}</li>`;
+      ingText += `- ${amt} ${r.name}\n`;
+    });
+    ingHtml += `</ul>`;
+  });
+
+  const steps = [];
+  steps.push(`Varm ovnen til ${temp} °C. Smør ${form} og beklæd bunden med bagepapir.`);
+  if (ids.has("eggWhite") && !ids.has("egg")) {
+    steps.push("Pisk æggehvider med en knivspids salt (og cream of tartar, hvis du har det) til stive tinder. Sødemiddel vendes i lidt ad gangen.");
+  } else if (ids.has("butter") || ids.has("cocoaButter")) {
+    const sweet = rows.filter(r => r.cat === "Sødt").map(r => r.name.toLowerCase());
+    steps.push(`Pisk ${ids.has("butter") ? "blødt smør" : "fedtstof"}${sweet.length ? " med " + sweet.join(" og ") : ""} lyst og luftigt, 2–3 minutter. Har du flødeost i opskriften, piskes den med her.`);
+    if (ids.has("egg") || ids.has("eggYolk")) steps.push("Tilsæt æg (og ev. blommer) ét ad gangen og pisk godt mellem hvert, så dejen emulgerer. Vanilje og eventuel espresso røres i.");
+  } else {
+    steps.push("Pisk æg og sødemiddel sammen, indtil blandingen er lysere og lidt tyk. Tilsæt vanilje og øvrige flydende smagsstoffer.");
+  }
+  if (ids.has("chocolate")) steps.push("Smelt den mørke chokolade over vandbad eller i korte intervaller i mikroovn. Lad den køle et par minutter og rør den i den fede masse.");
+  const dry = rows.filter(r => ["Mel & blender","Hævning","Bindemiddel"].includes(r.cat) || ["cocoa","cinnamon","salt"].includes(r.id));
+  if (dry.length) {
+    steps.push("I en anden skål blandes alle tørre ingredienser: mel, kakao, hævemiddel, salt, krydderi og bindemiddel. Sigtes eller vispes igennem, så xanthan/psyllium ikke klumper.");
+    steps.push("Vend de tørre ingredienser i den våde masse med en dejskraber. Stop, når der næsten ingen tørre pletter er tilbage — overpiskning gør kagen sej eller tæt.");
+  }
+  if (ids.has("almondMilk") || ids.has("milk") || ids.has("buttermilk") || ids.has("heavyCream") || ids.has("sourCream") || ids.has("oil")) {
+    steps.push("Tilsæt væske, olie eller creme til sidst og justér konsistensen. Dejen skal være spredbar, ikke løbende som pandekagedej. Kokosmel tykner i løbet af 2–3 minutter — vent lidt, før du hælder mere væske i.");
+  }
+  if (ids.has("carrot") || ids.has("banana") || ids.has("berries") || ids.has("pecans") || ids.has("walnutsTop") || ids.has("pecan")) {
+    steps.push("Vend frugt og/eller hakkede nødder i til sidst, så de ikke synker unødigt eller bliver knust.");
+  }
+  if (cocoG > 15) steps.push("Lad dejen hvile 3–5 minutter, så kokosmelet kan suge væske. Fordel derefter i formen og glat toppen.");
+  else steps.push("Fordel dejen i formen og glat toppen let. Bank formen én gang i bordet for at slå store luftlommer ud.");
+
+  if (ids.has("chocolate") && flourG < 60) {
+    steps.push(`Bag ${minutes}–${minutes+6} minutter. Midten skal stadig være lidt blød — det er kladdkaka-punktet. En tandstikker må gerne have lidt fugtigt smuld.`);
+  } else {
+    steps.push(`Bag ${minutes}–${minutes+8} minutter, til toppen er sat og en tandstikker kommer ud med få fugtige krummer. Keto-kager med nødde-mel bliver hurtigt tørre, hvis de overbages.`);
+  }
+  steps.push("Køl 10 minutter i formen, løsn kanten og læg på rist. Skær først, når kagen er næsten kold — nødde-mel-kager smuldrer, mens de er varme.");
+
+  if (ids.has("creamCheese")) {
+    steps.push("Forslag til topping: pisk flødeost med lidt sødemiddel og citronsaft til en tyk frosting. Smør på den kolde kage.");
+  } else if (ids.has("cocoa") || ids.has("chocolate")) {
+    steps.push("Forslag til topping: keto-ganache af piskefløde og 85 % chokolade, eller et tyndt lag smørcreme. Klassisk variant: chokoladeglasur.");
+  } else if (ids.has("lemon")) {
+    steps.push("Forslag til topping: citronglasur (sødemiddel + citronsaft) eller flødeskum med citronskal.");
+  } else {
+    steps.push("Server med flødeskum, bær eller en skefuld crème fraîche. Pudret sødemiddel på toppen giver et bager-look.");
+  }
+
+  if (hydRatio < 0.75) steps.push("Bemærk: vurderingen siger tør dej. Overvej +1 æg eller 20–40 g væske, før du bager.");
+  if (hydRatio > 1.5) steps.push("Bemærk: dejen ser våd ud. Bag et par minutter længere, eller drys 10–15 g ekstra mandel-/kokosmel i.");
+  if (crumbliness > 68 && binderG < 1) steps.push("Bemærk: høj smuldring. 1 tsk xanthan eller 1 spsk psyllium gør kagen mere skærbar.");
+
+  const lead = `${ketoish ? "En lav-carb" : "En"} ${moisture>65?"saftig":moisture<40?"fast":"blød"} ${density>65?"og tæt ":"og forholdsvis luftig "}kage til ca. 8 stykker. Forventet succes ${success}/100, smag ${taste}/100, keto ${keto}/100.`;
+
+  $("recipeTitle").textContent = title.charAt(0).toUpperCase() + title.slice(1);
+  $("recipeLead").textContent = lead;
+  $("recipeBadge").textContent = ketoish ? "Keto-opskrift" : "Opskrift";
+  $("recipeMeta").innerHTML = `
+    <span class="pill pill-mid">${form.replace("en ","")}</span>
+    <span class="pill pill-mid">${temp} °C · ${minutes}–${minutes+8} min</span>
+    <span class="pill pill-mid">8 stykker</span>
+    <span class="pill ${keto>=80?"pill-good":keto>=50?"pill-mid":"pill-bad"}">${netPerSlice.toFixed(1)} g net-carb/skive</span>
+    <span class="pill pill-mid">${Math.round(total)} g dej</span>`;
+  $("recipeIngredients").innerHTML = ingHtml;
+  $("recipeMethod").innerHTML = `<ol>${steps.map(s=>`<li>${s}</li>`).join("")}</ol>`;
+
+  lastTextRecipe = `${$("recipeTitle").textContent}\n${lead}\n\nOvntemperatur: ${temp} °C\nTid: ${minutes}–${minutes+8} min\nForm: ${form}\nPortioner: 8\nNet-carb pr. skive: ${netPerSlice.toFixed(1)} g\n\nINGREDIENSER\n${ingText}\nFREMGANGSMÅDE\n${steps.map((s,i)=>`${i+1}. ${s}`).join("\n")}\n`;
+}
+
+function fillSelects() {
+  $("nut1").innerHTML = NUTS.map(n=>`<option value="${n.mapsTo}">${n.name}</option>`).join("");
+  $("nut2").innerHTML = `<option value="">— valgfri 2. nød —</option>` + NUTS.map(n=>`<option value="${n.mapsTo}">${n.name}</option>`).join("");
+  $("fiber").innerHTML = FIBERS.map(n=>`<option value="${n.mapsTo||""}">${n.name}</option>`).join("");
+}
+
+function blendFlour() {
+  const a = DB.find(i=>i.id===$("nut1").value);
+  const b = $("nut2").value ? DB.find(i=>i.id===$("nut2").value) : null;
+  const f = $("fiber").value ? DB.find(i=>i.id===$("fiber").value) : null;
+  const ag = Number($("nut1g").value)||0;
+  const bg = Number($("nut2g").value)||0;
+  const fg = Number($("fiberg").value)||0;
+  const sum = ag+bg+fg;
+  if (sum < 10) return alert("Brug mindst 10 g i alt.");
+  const mix = (key) => (ag*(a[key]||0) + (b?bg*(b[key]||0):0) + (f?fg*(f[key]||0):0)) / sum;
+  customCount++;
+  const id = "custom"+customCount;
+  const name = $("blendName").value.trim() || `Hjemmelavet mel #${customCount}`;
+  DB.push({
+    id, name, cat:"Mel & blender",
+    net: mix("net"), fat: mix("fat"), prot: mix("prot"), fib: mix("fib"), cal: mix("cal"),
+    abs: mix("abs"), structure: mix("structure"), moisture: mix("moisture"), crumb: mix("crumb"),
+    sweet: mix("sweet"), rich: mix("rich"), rise: mix("rise"), flavor: mix("flavor"), keto: mix("keto"),
+    impact: `Blendet mel af ${a.name}${b? " + "+b.name:""}${f? " + "+f.name:""}. Egenskaber er vægtet gennemsnit. Nøddemel har intet gluten — hold æg og evt. bindemiddel i opskriften.`
+  });
+  addIng(id, Math.round(sum));
+  renderCatalog();
+}
+
+function setRecipe(items) {
+  recipe = items.map(([id,grams]) => ({id, grams}));
+  renderRecipe(); analyze();
+}
+
+function randomKeto() {
+  const profiles = [
+    {name:"Chokolade-mandel", items:[
+      ["almond",160],["coconutFlour",25],["cocoa",28],["erythritol",80],["butter",90],["egg",200],["bp",8],["vanilla",6],["salt",2],["xanthan",2],["espresso",20]
+    ]},
+    {name:"Vanilje-sky", items:[
+      ["almond",180],["coconutFlour",20],["allulose",75],["butter",70],["oil",25],["egg",220],["almondMilk",40],["bp",8],["vanilla",8],["salt",2],["psyllium",4]
+    ]},
+    {name:"Citron-flødeost", items:[
+      ["almond",140],["creamCheese",120],["allulose",70],["egg",180],["butter",60],["lemon",25],["bp",7],["salt",2],["vanilla",5],["xanthan",2]
+    ]},
+    {name:"Hasselnød-praliné", items:[
+      ["hazelnut",150],["almond",40],["cocoa",20],["monk",70],["butter",80],["egg",180],["bp",6],["salt",2],["vanilla",4]
+    ]},
+    {name:"Flourless kladdkaka-keto", items:[
+      ["chocolate",120],["cocoa",15],["butter",90],["egg",200],["erythritol",60],["almond",40],["vanilla",5],["salt",2]
+    ]},
+    {name:"Kanel-pekan", items:[
+      ["almond",150],["pecan",40],["coconutFlour",18],["monk",65],["butter",80],["egg",180],["cinnamon",4],["bp",7],["salt",2],["sourCream",40]
+    ]}
+  ];
+  const p = profiles[Math.floor(Math.random()*profiles.length)];
+  cakeName = p.name;
+  const items = p.items.map(([id,g]) => [id, Math.max(1, Math.round(g * (0.88 + Math.random()*0.24)))]);
+  setRecipe(items);
+  $("verdict").insertAdjacentHTML("afterbegin", `<div style="margin-bottom:8px"><span class="pill pill-good">${p.name}</span> Tilfældig keto-profil med små variationer i mængder.</div>`);
+}
+
+function classicChocolate() {
+  cakeName = "Klassisk chokoladekage";
+  setRecipe([
+    ["wheat",180],["sugar",180],["butter",150],["egg",150],["cocoa",40],["milk",80],["bp",8],["vanilla",6],["salt",2]
+  ]);
+}
+
+function init() {
+  renderCats();
+  renderCatalog();
+  fillSelects();
+  $("search").oninput = renderCatalog;
+  $("btnBlend").onclick = blendFlour;
+  $("btnRandom").onclick = randomKeto;
+  $("btnClassic").onclick = classicChocolate;
+  $("btnClear").onclick = () => { recipe=[]; cakeName=""; renderRecipe(); analyze(); };
+  $("btnKnowledge").onclick = () => $("modal").style.display = "flex";
+  $("closeModal").onclick = () => $("modal").style.display = "none";
+  $("modal").onclick = (e) => { if (e.target.id==="modal") $("modal").style.display="none"; };
+  $("btnCopy").onclick = async () => {
+    if (!lastTextRecipe) return;
+    try { await navigator.clipboard.writeText(lastTextRecipe); $("btnCopy").textContent = "Kopieret"; setTimeout(()=>$("btnCopy").textContent="Kopiér opskrift", 1400); }
+    catch { alert(lastTextRecipe); }
+  };
+  $("btnPrint").onclick = () => window.print();
+  analyze();
+}
+init();
+</script>
+</body>
+</html>

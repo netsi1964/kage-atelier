@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kageatelier — Byg, vurder og keto-tjek din kage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,700;6..72,800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo">🎂</div>
+        <div>
+          <h1 id="appTitle">Kageatelier</h1>
+          <p id="appSubtitle">Frontend viser. Deno-backend udregner scoring, keto og opskrift.</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <div class="locale-toggle" id="localeToggle" aria-label="Sprog">
+          <button class="locale-chip" data-locale="en" type="button">EN</button>
+          <button class="locale-chip" data-locale="da" type="button">DA</button>
+          <button class="locale-chip" data-locale="es" type="button">ES</button>
+          <button class="locale-chip" data-locale="ch" type="button">中文</button>
+        </div>
+        <div class="theme-toggle" id="themeToggle" aria-label="Farvetema">
+          <button class="theme-chip" data-theme="light" type="button">Lys</button>
+          <button class="theme-chip" data-theme="dark" type="button">Mørk</button>
+        </div>
+        <a class="btn btn-ghost" id="navBrowse" href="/opskrifter.html">Gennemse opskrifter</a>
+        <button class="btn btn-keto" id="btnRandom">Tilfældig keto-kage</button>
+        <button class="btn btn-gold" id="btnClassic">Klassisk chokolade</button>
+        <button class="btn btn-ghost" id="btnKnowledge">Vidensbase</button>
+        <button class="btn btn-danger" id="btnClear">Tøm opskrift</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+          <h2 id="ingredientsSection">Ingredienser</h2>
+        <div class="body">
+          <input class="search" id="search" placeholder="Søg ingrediens…" />
+          <div class="cats" id="cats"></div>
+          <div class="ing-list" id="catalog"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>
+            <span id="yourCakeSection">Din kage</span>
+          <span class="tiny" id="totalWeight">0 g</span>
+        </h2>
+        <div class="body">
+          <div class="recipe-controls">
+            <label class="field">
+                <span class="field-label" id="servingsFieldLabel">Personer</span>
+              <label class="input-unit input-unit-soft"><input id="servings" type="number" min="1" max="32" value="2" /><span>pers.</span></label>
+            </label>
+            <div class="field">
+                <span class="field-label" id="unitModeFieldLabel">Vis ingredienser som</span>
+              <div class="segmented" id="unitModes">
+                <button class="seg on" data-unit="kitchen" type="button">Køkkenmål</button>
+                <button class="seg" data-unit="weight" type="button">Vægt</button>
+              </div>
+            </div>
+          </div>
+          <div class="tiny" id="servingsHint">Appen skalerer automatisk en grundopskrift på 8 stykker til det antal personer, du vælger.</div>
+          <div id="recipe" class="empty">Tilføj ingredienser fra venstre — eller tryk på en generator.</div>
+          <div class="keto-box" style="margin-top:16px">
+            <strong>Hjemmelavet mel</strong>
+              <strong id="blendTitle">Hjemmelavet mel</strong>
+              <p class="tiny" id="blendBody">Blend nødder og fibre. Backend beregner egenskaberne og sender et nyt mel tilbage.</p>
+            <div class="blend">
+              <div class="blend-row">
+                <label class="select-shell"><select id="nut1"></select></label>
+                <label class="input-unit"><input id="nut1g" type="number" min="0" value="80" /><span>g</span></label>
+              </div>
+              <div class="blend-row">
+                <label class="select-shell"><select id="nut2"></select></label>
+                <label class="input-unit"><input id="nut2g" type="number" min="0" value="20" /><span>g</span></label>
+              </div>
+              <div class="blend-row">
+                <label class="select-shell"><select id="fiber"></select></label>
+                <label class="input-unit"><input id="fiberg" type="number" min="0" value="5" /><span>g</span></label>
+              </div>
+              <input id="blendName" class="search" style="margin:0" placeholder="Navn, f.eks. Hasselnød-psyllium mel" />
+              <button class="btn btn-gold" id="btnBlend">Blend og tilføj til kagen</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+          <h2 id="analysisSection">Live vurdering</h2>
+        <div class="body">
+          <div class="scores">
+            <div class="score"><span>Succes</span><b id="sSuccess">–</b></div>
+            <div class="score"><span>Smag</span><b id="sTaste">–</b></div>
+            <div class="score"><span>Keto</span><b id="sKeto">–</b></div>
+          </div>
+          <div id="ketoMeta" class="tiny"></div>
+          <div class="bars" id="bars"></div>
+          <div class="note" id="verdict">Tilføj ingredienser for at få en vurdering.</div>
+          <div class="suggest" id="suggest"></div>
+          <div class="impact" id="impacts"></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card recipe-card" id="recipeCard">
+      <h2>
+          <span id="recipeSection">Opskrift</span>
+        <span class="tiny" id="recipeBadge">Tom</span>
+      </h2>
+      <div class="body">
+        <h3 class="recipe-title" id="recipeTitle">Din kage</h3>
+        <p class="recipe-lead" id="recipeLead">Backend skriver opskriften, når der er ingredienser.</p>
+        <div class="recipe-meta" id="recipeMeta"></div>
+        <div class="recipe-grid">
+          <div>
+              <h3 id="recipeIngredientsHeading">Ingredienser</h3>
+            <div id="recipeIngredients" class="empty">Ingen ingredienser endnu.</div>
+          </div>
+          <div>
+            <h3 id="recipeMethodHeading">Fremgangsmåde</h3>
+            <div id="recipeMethod" class="empty">Metoden skrives på serveren.</div>
+          </div>
+        </div>
+        <div class="copy-row">
+          <input id="saveTitle" class="search save-input" placeholder="Navn til gemt opskrift" />
+          <input id="saveImageUrl" class="search save-input" placeholder="Billede-URL, hvis du har en" />
+          <button class="btn btn-keto" id="btnSave">Gem opskrift</button>
+          <button class="btn btn-gold" id="btnCopy">Kopiér opskrift som MD</button>
+          <button class="btn btn-ghost" id="btnPrint">Udskriv</button>
+        </div>
+        <div class="tiny" id="saveStatus"></div>
+      </div>
+    </section>
+
+    <footer>
+      Beregninger kører i Deno-modulet <code>lib/engine.ts</code>. UI’en viser kun svaret. Modellen er heuristisk og erstatter ikke en testbagning.
+    </footer>
+  </div>
+
+  <div class="modal-bg" id="modal">
+    <div class="modal">
+      <h2 style="margin-top:0" id="knowTitle">Vidensbase</h2>
+      <p id="knowBody"></p>
+      <ul id="knowPoints"></ul>
+      <button class="btn btn-ghost" id="closeModal">Luk</button>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kageatelier — Gennemse opskrifter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,700;6..72,800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero browse-hero">
+      <div class="brand">
+        <div class="logo">📚</div>
+        <div>
+          <h1 id="browseTitle">Opskriftsbibliotek</h1>
+          <p id="browseSubtitle">Søg, filtrér og åbn tidligere gemte opskrifter.</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <div class="locale-toggle" id="localeToggle" aria-label="Sprog">
+          <button class="locale-chip" data-locale="en" type="button">EN</button>
+          <button class="locale-chip" data-locale="da" type="button">DA</button>
+          <button class="locale-chip" data-locale="es" type="button">ES</button>
+          <button class="locale-chip" data-locale="ch" type="button">中文</button>
+        </div>
+        <div class="theme-toggle" id="themeToggle" aria-label="Farvetema">
+          <button class="theme-chip" data-theme="light" type="button">Lys</button>
+          <button class="theme-chip" data-theme="dark" type="button">Mørk</button>
+        </div>
+        <a class="btn btn-ghost" id="navBack" href="/index.html">Tilbage til atelieret</a>
+      </div>
+    </header>
+
+    <section class="card browse-shell">
+      <div class="body browse-controls">
+        <input id="browseQuery" class="search" placeholder="Søg i titel, tags eller beskrivelse" />
+        <select id="browseStyle">
+          <option value="">Alle typer</option>
+          <option value="Keto">Keto</option>
+          <option value="Klassisk">Klassisk</option>
+        </select>
+        <input id="browseTag" class="search" placeholder="Filtrér på tag, fx chokolade" />
+      </div>
+    </section>
+
+    <section class="browse-grid" id="browseGrid"></section>
+    <div class="empty" id="browseEmpty" hidden>Ingen opskrifter matcher dine filtre endnu.</div>
+  </div>
+  <script src="/browse.js"></script>
+</body>
+</html>

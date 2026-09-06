@@ -1,0 +1,8 @@
+.env
+data/
+*.kv
+*.kv-journal
+*.kv-shm
+*.kv-wal
+.DS_Store
+node_modules/
