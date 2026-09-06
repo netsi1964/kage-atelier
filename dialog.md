@@ -132,3 +132,6 @@ Makroer i analyse, UI og opskrift (4 sprog). i18n.ts: TS2352 fixet, DEFAULT_LOCA
 
 ## [2026-09-06 21:11] Claude — KV-lager + GitHub (c6 aktiv)
 Deno KV på Deploy, fil lokalt. git init + public repo.
+
+## [2026-09-06 21:14] Claude — på GitHub (c6 frigivet)
+https://github.com/netsi1964/kage-atelier. KV-lager auto på Deploy. Pull før push.

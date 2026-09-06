@@ -10,7 +10,7 @@ Backend er Deno. Frontend er kun UI. Al scoring og opskriftsgenerering ligger i 
 deno task start
 ```
 
-Åbn http://127.0.0.1:8787
+Åbn http://127.0.0.1:8787. Anden port: `PORT=8788 deno task start`. Ingen `.env` er nødvendig.
 
 ```bash
 deno task test
