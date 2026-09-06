@@ -77,7 +77,8 @@
     "macroCarbs": "Kulhydrater (net)",
     "macroFat": "Fedt",
     "macroProtein": "Protein",
-    "macroPerSliceCaption": "pr. stykke"
+    "macroPerSliceCaption": "pr. stykke",
+    "imageMissing": "Intet billede endnu"
   },
   "categories": {
     "Alle": "Alle",

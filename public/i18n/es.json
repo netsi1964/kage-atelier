@@ -77,7 +77,8 @@
     "macroCarbs": "Carbohidratos (netos)",
     "macroFat": "Grasa",
     "macroProtein": "Proteína",
-    "macroPerSliceCaption": "por porción"
+    "macroPerSliceCaption": "por porción",
+    "imageMissing": "Sin imagen todavía"
   },
   "categories": {
     "Alle": "Todo",

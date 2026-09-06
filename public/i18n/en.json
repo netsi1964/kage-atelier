@@ -77,7 +77,8 @@
     "macroCarbs": "Carbs (net)",
     "macroFat": "Fat",
     "macroProtein": "Protein",
-    "macroPerSliceCaption": "per serving"
+    "macroPerSliceCaption": "per serving",
+    "imageMissing": "No image yet"
   },
   "categories": {
     "Alle": "All",

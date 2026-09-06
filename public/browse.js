@@ -1,12 +1,64 @@
 const $ = (id) => document.getElementById(id);
 
+const SUPPORTED_LOCALES = ["da", "en", "es", "ch"];
+
 const state = {
   uploadEnabled: false,
+  locale: loadLocale(),
+  ui: {},
   query: "",
   style: "",
   tag: "",
   theme: localStorage.getItem("kageatelier-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
 };
+
+function loadLocale() {
+  try {
+    const saved = localStorage.getItem("kageatelier-locale");
+    if (SUPPORTED_LOCALES.includes(saved)) return saved;
+  } catch { /* ignore */ }
+  return "da";
+}
+
+function t(key, fallback) {
+  return state.ui[key] ?? fallback ?? key;
+}
+
+function setText(id, value) {
+  const el = $(id);
+  if (el && value != null) el.textContent = value;
+}
+
+async function loadLocaleBundle() {
+  try {
+    const res = await fetch(`/i18n/${state.locale}.json`, { cache: "no-store" });
+    state.ui = (await res.json()).ui ?? {};
+  } catch {
+    state.ui = {};
+  }
+  document.documentElement.lang = state.locale === "ch" ? "zh" : state.locale;
+  setText("browseTitle", t("browseTitle"));
+  setText("browseSubtitle", t("browseSubtitle"));
+  setText("navBack", t("navBack"));
+  setText("browseEmpty", t("browseEmpty"));
+  const q = $("browseQuery"); if (q) q.placeholder = t("browseQueryPlaceholder");
+  const tag = $("browseTag"); if (tag) tag.placeholder = t("browseTagPlaceholder");
+  const styleAll = $("browseStyle")?.querySelector('option[value=""]'); if (styleAll) styleAll.textContent = t("browseStyleAll");
+  document.querySelectorAll("#themeToggle [data-theme]").forEach((button) => {
+    button.textContent = button.dataset.theme === "light" ? t("themeLight") : t("themeDark");
+  });
+  document.querySelectorAll("#localeToggle [data-locale]").forEach((button) => {
+    button.classList.toggle("on", button.dataset.locale === state.locale);
+  });
+}
+
+async function setLocale(locale) {
+  if (!SUPPORTED_LOCALES.includes(locale)) return;
+  state.locale = locale;
+  try { localStorage.setItem("kageatelier-locale", locale); } catch { /* ignore */ }
+  await loadLocaleBundle();
+  await refresh();
+}
 
 function applyTheme(theme) {
   state.theme = theme;
@@ -29,6 +81,7 @@ function queryString() {
   if (state.query) params.set("query", state.query);
   if (state.style) params.set("style", state.style);
   if (state.tag) params.set("tag", state.tag);
+  params.set("lang", state.locale);
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 }
@@ -38,7 +91,7 @@ function renderList(items) {
   $("browseGrid").innerHTML = items.map((item) => {
     const image = item.image?.url
       ? `<img class="browse-image" src="${item.image.url}" alt="${item.image.alt}" />`
-      : `<div class="browse-placeholder">Intet billede endnu<br><span>Læg filen i repoet som <code>${item.imagePath}</code> (eller .png / .webp)</span></div>`;
+      : `<div class="browse-placeholder browse-placeholder-image"><img class="browse-image" src="/images/default-cover.jpg" alt="" /><span>${t("imageMissing", "Intet billede endnu")} · <code>${item.imagePath}</code> (.jpg / .png / .webp)</span></div>`;
     const upload = state.uploadEnabled
       ? `<label class="btn btn-ghost upload-btn">${item.image?.url ? "Skift billede" : "Upload billede"}<input type="file" accept="image/jpeg,image/png,image/webp" data-upload="${item.id}" hidden /></label>`
       : "";
@@ -53,14 +106,14 @@ function renderList(items) {
           <h3>${item.title}</h3>
           <p class="browse-summary">${item.summary}</p>
           <div class="recipe-meta">
-            <span class="pill pill-mid">${item.servings} personer</span>
+            <span class="pill pill-mid">${item.servings} ${t("servingsLabel", "personer")}</span>
             <span class="pill pill-mid">${item.difficulty}</span>
             <span class="pill pill-mid">${new Date(item.updatedAt).toLocaleDateString("da-DK")}</span>
           </div>
           <div class="browse-tags">${item.tags.map((tag) => `<span class="chip">${tag}</span>`).join("")}</div>
           <div class="browse-footer">
-            <span class="tiny">Metadata: ${item.provider}</span>
-            <a class="btn btn-gold" href="/index.html?recipe=${encodeURIComponent(item.id)}">Åbn i atelieret</a>
+            <span class="tiny">${t("browseMetadata", "Metadata")}: ${item.provider}</span>
+            <a class="btn btn-gold" href="/index.html?recipe=${encodeURIComponent(item.id)}">${t("browseOpen", "Åbn i atelieret")}</a>
             ${upload}
             <button class="btn btn-danger" data-delete="${item.id}" type="button">Slet</button>
           </div>
@@ -132,6 +185,9 @@ function bind() {
   document.querySelectorAll("#themeToggle [data-theme]").forEach((button) => {
     button.onclick = () => applyTheme(button.dataset.theme);
   });
+  document.querySelectorAll("#localeToggle [data-locale]").forEach((button) => {
+    button.onclick = () => setLocale(button.dataset.locale);
+  });
   $("browseQuery").oninput = () => {
     state.query = $("browseQuery").value.trim();
     refresh();
@@ -148,4 +204,4 @@ function bind() {
 
 applyTheme(state.theme);
 bind();
-loadHealth().then(refresh);
+loadLocaleBundle().then(loadHealth).then(refresh);

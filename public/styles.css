@@ -129,8 +129,10 @@ header.hero {
 .theme-chip.on,
 .locale-chip.on,
 .seg.on {
-  background: rgba(191, 131, 66, 0.18);
-  color: var(--text);
+  background: var(--gold);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(120, 80, 30, 0.25);
 }
 
 .btn {
@@ -507,3 +509,8 @@ footer { margin-top: 22px; color: var(--text-soft); font-size: 12px; }
 .upload-btn { cursor: pointer; }
 .upload-status { margin-top: 6px; min-height: 1em; word-break: break-word; }
 .browse-placeholder code { font-size: 11px; }
+
+.browse-placeholder-image { position: relative; padding: 0; overflow: hidden; }
+.browse-placeholder-image img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; opacity: 0.9; }
+.browse-placeholder-image span { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; font-size: 12px; background: rgba(40, 24, 12, 0.55); color: #fff; }
+.browse-placeholder-image code { color: #ffe2b0; }

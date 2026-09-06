@@ -77,7 +77,8 @@
     "macroCarbs": "碳水（净）",
     "macroFat": "脂肪",
     "macroProtein": "蛋白质",
-    "macroPerSliceCaption": "每块"
+    "macroPerSliceCaption": "每块",
+    "imageMissing": "暂无图片"
   },
   "categories": {
     "Alle": "全部",
