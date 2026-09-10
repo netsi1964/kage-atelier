@@ -156,3 +156,8 @@ Tre faner: Ingredienser · Din kage (kage + live vurdering) · Opskrift (med per
 Tre faner med deep-link (#ingredienser / #kage / #opskrift). Opskrift-fanen har nu
 personer, køkkenmål/vægt og billede med upload. Aktiv fane = guldkant der smelter
 sammen med hårstregen. Filerne er fri igen.
+
+## [2026-09-10 23:30] Claude — synk prod ↔ lokalt (c9)
+`deno task sync` (status/pull/push) i `tools/sync-recipes.ts`. Bevarer id og slug, så
+billedfilerne i repoet passer. Push kræver KAGEATELIER_SYNC_TOKEN på serveren, ellers 405.
+Rører `main.ts`, `deno.json`, `README.md`, `tools/`.

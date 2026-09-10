@@ -8,7 +8,8 @@
     "test": "deno test --allow-env --allow-read --allow-write --allow-net --no-lock lib/engine_test.ts lib/recipe_store_test.ts",
     "deploy": "deployctl deploy --project=kage-atelier --entrypoint=main.ts --prod --include=main.ts --include=lib --include=public --include=deno.json --save-config",
     "dialog": "deno run --allow-net --allow-read --allow-env tools/dialog-view.ts",
-    "migrate-kv": "deno run --allow-read --allow-write --allow-env --allow-net tools/migrate-kv.ts"
+    "migrate-kv": "deno run --allow-read --allow-write --allow-env --allow-net tools/migrate-kv.ts",
+    "sync": "deno run --allow-net --allow-read --allow-write --allow-env tools/sync-recipes.ts"
   },
   "deploy": {
     "project": "kage-atelier",

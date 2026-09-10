@@ -93,6 +93,30 @@ Slug'en dannes ved gem (`<titel>-<8 tegn af id>`, fx `rabarber-mandel-3f2a9c1e`)
 
 Nemmeste arbejdsgang: kør `deno task dev`, åbn `/opskrifter.html`, tryk **Upload billede** på kortet. Filen gemmes med det rigtige navn, og du committer og pusher den. På Deno Deploy er upload slået fra, fordi filsystemet er read-only; der virker kun filer i repoet.
 
+## Synk mellem prod og lokalt
+
+Prod gemmer i Deno KV, lokalt gemmes i `data/recipes.json` (og en lokal KV-fil). De to
+har ingen fælles historik, så de driver fra hinanden. Det gør ondt på billeder: filnavnet
+indeholder de første 8 tegn af opskriftens id, og gemmer du "samme" kage lokalt, får den
+et nyt id og dermed et navn, der ikke passer til filen i repoet.
+
+`deno task sync` løser det ved at kopiere hele opskriften med id og slug i behold:
+
+```sh
+deno task sync                 # status: hvad ligger kun i prod, kun lokalt, hvad er nyere
+deno task sync pull            # prod → lokalt (skriver både fil- og KV-lageret)
+deno task sync pull --dry-run  # vis hvad der ville ske
+deno task sync pull --store=file
+deno task sync push            # lokalt → prod
+```
+
+Uden `--force` springes opskrifter over, hvor modparten er nyere. Intet slettes.
+
+**Push er slået fra i prod som standard.** Endpointet `PUT /api/recipes/:id` svarer 405,
+indtil `KAGEATELIER_SYNC_TOKEN` er sat som miljøvariabel i Deno Deploy-dashboardet. Sæt
+den samme værdi lokalt, når du vil pushe. Resten af API'et er uden login, så lad være med
+at lægge noget følsomt i basen.
+
 ## Deno Deploy
 
 Appen kører på **https://kage-atelier.netsi1964.deno.net**.

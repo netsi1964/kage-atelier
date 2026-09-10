@@ -8,6 +8,7 @@ import {
   getSavedRecipe,
   getCatalog,
   imagesWritable,
+  importSavedRecipe,
   listSavedRecipes,
   normalizeLocale,
   resolveStoreKind,
@@ -17,6 +18,7 @@ import {
   type BlendInput,
   type Ingredient,
   type Locale,
+  type SavedRecipe,
   type SaveRecipeInput,
 } from "./lib/mod.ts";
 
@@ -140,6 +142,23 @@ async function handler(req: Request): Promise<Response> {
       return json({ ok: true, ...saved, hint: `git add ${saved.path} && git commit -m "Billede: ${recipe.title}" && git push` }, 201);
     } catch (err) {
       return error(err instanceof Error ? err.message : "Upload fejlede");
+    }
+  }
+  // Synk fra et lokalt lager. Slået fra medmindre KAGEATELIER_SYNC_TOKEN er sat på serveren.
+  // Bevarer id og slug, så billedfilerne i repoet bliver ved med at passe.
+  if (req.method === "PUT" && /^\/api\/recipes\/[^/]+$/.test(path)) {
+    const expected = Deno.env.get("KAGEATELIER_SYNC_TOKEN");
+    if (!expected) return error("Synk er slået fra. Sæt KAGEATELIER_SYNC_TOKEN på serveren for at slå den til.", 405);
+    if (req.headers.get("x-sync-token") !== expected) return error("Forkert synk-token.", 403);
+    const id = path.split("/")[3];
+    try {
+      const body = await readBody<SavedRecipe>(req);
+      if (body.id !== id) return error("Opskriftens id passer ikke til adressen.", 400);
+      if (!Array.isArray(body.items) || !body.items.length) return error("Opskriften mangler ingredienser.", 400);
+      await importSavedRecipe(body);
+      return json({ ok: true, id, title: body.title });
+    } catch (err) {
+      return error(err instanceof Error ? err.message : "Synk fejlede");
     }
   }
   if (req.method === "DELETE" && /^\/api\/recipes\/[^/]+$/.test(path)) {
