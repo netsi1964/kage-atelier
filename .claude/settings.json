@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(rm \"public/images/recipes/:sesam-tahin-chokolade-fd3bd517.jpg\")",
+      "Bash(git add *)"
+    ]
+  }
+}
