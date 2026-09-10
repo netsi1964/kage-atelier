@@ -20,7 +20,7 @@
     "unitKitchen": "Kitchen measures",
     "unitWeight": "Weight",
     "servingsHint": "The app scales a base recipe for 8 servings to the number of people you choose.",
-    "emptyRecipe": "Add ingredients from the left or use a generator.",
+    "emptyRecipe": "Add ingredients from the Ingredients tab, or use a generator.",
     "blendTitle": "Homemade flour",
     "blendBody": "Blend nuts and fibers. The backend calculates the properties and sends a new flour back.",
     "blendNamePlaceholder": "Name, for example Hazelnut-psyllium flour",
@@ -86,7 +86,13 @@
     "imageUploading": "Uploading…",
     "imageSavedAs": "Saved as",
     "imageCommitHint": "Remember: git add + commit + push.",
-    "imageUploadDisabled": "Upload is off here. Put the file in the repo and push."
+    "imageUploadDisabled": "Upload is off here. Put the file in the repo and push.",
+    "newRecipe": "New recipe",
+    "unsavedTitle": "Your cake isn't saved",
+    "unsavedBody": "Starting over drops the ingredients you added. Save it first if you want to find it again.",
+    "unsavedSaveFirst": "Save and start over",
+    "unsavedDiscard": "Start over without saving",
+    "cancel": "Cancel"
   },
   "categories": {
     "Alle": "All",

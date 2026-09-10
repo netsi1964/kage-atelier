@@ -34,7 +34,7 @@
         <button class="btn btn-keto" id="btnRandom">Tilfældig keto-kage</button>
         <button class="btn btn-gold" id="btnClassic">Klassisk chokolade</button>
         <button class="btn btn-ghost" id="btnKnowledge">Vidensbase</button>
-        <button class="btn btn-danger" id="btnClear">Tøm opskrift</button>
+        <button class="btn btn-danger" id="btnClear">Ny opskrift</button>
       </div>
     </header>
 
@@ -51,6 +51,26 @@
           <input class="search" id="search" placeholder="Søg ingrediens…" />
           <div class="cats" id="cats"></div>
           <div class="ing-list" id="catalog"></div>
+        <div class="keto-box blend-box" id="blendBox" hidden>
+          <strong id="blendTitle">Hjemmelavet mel</strong>
+            <p class="tiny" id="blendBody">Blend nødder og fibre. Backend beregner egenskaberne og sender et nyt mel tilbage.</p>
+          <div class="blend">
+            <div class="blend-row">
+              <label class="select-shell"><select id="nut1"></select></label>
+              <label class="input-unit"><input id="nut1g" type="number" min="0" value="80" /><span>g</span></label>
+            </div>
+            <div class="blend-row">
+              <label class="select-shell"><select id="nut2"></select></label>
+              <label class="input-unit"><input id="nut2g" type="number" min="0" value="20" /><span>g</span></label>
+            </div>
+            <div class="blend-row">
+              <label class="select-shell"><select id="fiber"></select></label>
+              <label class="input-unit"><input id="fiberg" type="number" min="0" value="5" /><span>g</span></label>
+            </div>
+            <input id="blendName" class="search" style="margin:0" placeholder="Navn, f.eks. Hasselnød-psyllium mel" />
+            <button class="btn btn-gold" id="btnBlend">Blend og tilføj til kagen</button>
+          </div>
+        </div>
         </div>
       </section>
 
@@ -78,27 +98,7 @@
             </div>
           </div>
           <div class="tiny" id="servingsHint">Appen skalerer automatisk en grundopskrift på 8 stykker til det antal personer, du vælger.</div>
-          <div id="recipe" class="empty">Tilføj ingredienser fra venstre — eller tryk på en generator.</div>
-          <div class="keto-box" style="margin-top:16px">
-            <strong id="blendTitle">Hjemmelavet mel</strong>
-              <p class="tiny" id="blendBody">Blend nødder og fibre. Backend beregner egenskaberne og sender et nyt mel tilbage.</p>
-            <div class="blend">
-              <div class="blend-row">
-                <label class="select-shell"><select id="nut1"></select></label>
-                <label class="input-unit"><input id="nut1g" type="number" min="0" value="80" /><span>g</span></label>
-              </div>
-              <div class="blend-row">
-                <label class="select-shell"><select id="nut2"></select></label>
-                <label class="input-unit"><input id="nut2g" type="number" min="0" value="20" /><span>g</span></label>
-              </div>
-              <div class="blend-row">
-                <label class="select-shell"><select id="fiber"></select></label>
-                <label class="input-unit"><input id="fiberg" type="number" min="0" value="5" /><span>g</span></label>
-              </div>
-              <input id="blendName" class="search" style="margin:0" placeholder="Navn, f.eks. Hasselnød-psyllium mel" />
-              <button class="btn btn-gold" id="btnBlend">Blend og tilføj til kagen</button>
-            </div>
-          </div>
+          <div id="recipe" class="empty">Tilføj ingredienser fra Ingredienser-fanen — eller tryk på en generator.</div>
         </div>
       </section>
 
@@ -172,6 +172,18 @@
     <footer>
       Beregninger kører i Deno-modulet <code>lib/engine.ts</code>. UI’en viser kun svaret. Modellen er heuristisk og erstatter ikke en testbagning.
     </footer>
+  </div>
+
+  <div class="modal-bg" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal modal-confirm">
+      <h2 id="confirmTitle">Din kage er ikke gemt</h2>
+      <p id="confirmBody">Starter du forfra, forsvinder de ingredienser, du har lagt i. Gem den først, hvis du vil kunne finde den igen.</p>
+      <div class="modal-actions">
+        <button class="btn btn-keto" id="confirmSave" type="button">Gem og start forfra</button>
+        <button class="btn btn-danger" id="confirmDiscard" type="button">Start forfra uden at gemme</button>
+        <button class="btn btn-ghost" id="confirmCancel" type="button">Fortryd</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal-bg" id="modal">

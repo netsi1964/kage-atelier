@@ -20,7 +20,7 @@
     "unitKitchen": "Medidas de cocina",
     "unitWeight": "Peso",
     "servingsHint": "La app escala automáticamente una receta base para 8 porciones al número de personas que elijas.",
-    "emptyRecipe": "Añade ingredientes desde la izquierda o usa un generador.",
+    "emptyRecipe": "Añade ingredientes desde la pestaña Ingredientes o usa un generador.",
     "blendTitle": "Harina casera",
     "blendBody": "Mezcla frutos secos y fibras. El backend calcula las propiedades y devuelve una harina nueva.",
     "blendNamePlaceholder": "Nombre, por ejemplo harina de avellana y psyllium",
@@ -86,7 +86,13 @@
     "imageUploading": "Subiendo…",
     "imageSavedAs": "Guardada como",
     "imageCommitHint": "Recuerda: git add + commit + push.",
-    "imageUploadDisabled": "La subida está desactivada aquí. Pon el archivo en el repo y haz push."
+    "imageUploadDisabled": "La subida está desactivada aquí. Pon el archivo en el repo y haz push.",
+    "newRecipe": "Nueva receta",
+    "unsavedTitle": "Tu pastel no está guardado",
+    "unsavedBody": "Si empiezas de nuevo, perderás los ingredientes que añadiste. Guárdalo primero si quieres volver a encontrarlo.",
+    "unsavedSaveFirst": "Guardar y empezar de nuevo",
+    "unsavedDiscard": "Empezar de nuevo sin guardar",
+    "cancel": "Cancelar"
   },
   "categories": {
     "Alle": "Todo",

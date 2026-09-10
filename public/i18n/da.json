@@ -20,7 +20,7 @@
     "unitKitchen": "Køkkenmål",
     "unitWeight": "Vægt",
     "servingsHint": "Appen skalerer automatisk en grundopskrift på 8 stykker til det antal personer, du vælger.",
-    "emptyRecipe": "Tilføj ingredienser fra venstre — eller tryk på en generator.",
+    "emptyRecipe": "Tilføj ingredienser fra Ingredienser-fanen — eller tryk på en generator.",
     "blendTitle": "Hjemmelavet mel",
     "blendBody": "Blend nødder og fibre. Backend beregner egenskaberne og sender et nyt mel tilbage.",
     "blendNamePlaceholder": "Navn, f.eks. Hasselnød-psyllium mel",
@@ -86,7 +86,13 @@
     "imageUploading": "Uploader…",
     "imageSavedAs": "Gemt som",
     "imageCommitHint": "Husk: git add + commit + push.",
-    "imageUploadDisabled": "Upload er slået fra her. Læg filen i repoet og push."
+    "imageUploadDisabled": "Upload er slået fra her. Læg filen i repoet og push.",
+    "newRecipe": "Ny opskrift",
+    "unsavedTitle": "Din kage er ikke gemt",
+    "unsavedBody": "Starter du forfra, forsvinder de ingredienser, du har lagt i. Gem den først, hvis du vil kunne finde den igen.",
+    "unsavedSaveFirst": "Gem og start forfra",
+    "unsavedDiscard": "Start forfra uden at gemme",
+    "cancel": "Fortryd"
   },
   "categories": {
     "Alle": "Alle",

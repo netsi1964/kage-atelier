@@ -20,7 +20,7 @@
     "unitKitchen": "厨房量杯",
     "unitWeight": "重量",
     "servingsHint": "应用会把 8 人份的基础配方自动缩放到你选择的人数。",
-    "emptyRecipe": "从左侧添加食材，或使用生成器。",
+    "emptyRecipe": "从「原料」标签页添加原料，或使用生成器。",
     "blendTitle": "自制粉类",
     "blendBody": "混合坚果和纤维。后端会计算属性并返回新的粉类。",
     "blendNamePlaceholder": "名称，例如 榛子车前子粉",
@@ -86,7 +86,13 @@
     "imageUploading": "上传中…",
     "imageSavedAs": "已保存为",
     "imageCommitHint": "别忘了：git add + commit + push。",
-    "imageUploadDisabled": "此处已关闭上传。请将文件放入仓库并推送。"
+    "imageUploadDisabled": "此处已关闭上传。请将文件放入仓库并推送。",
+    "newRecipe": "新配方",
+    "unsavedTitle": "你的蛋糕还没保存",
+    "unsavedBody": "重新开始会丢掉你已加入的原料。想以后再找到它，请先保存。",
+    "unsavedSaveFirst": "保存并重新开始",
+    "unsavedDiscard": "不保存，直接重新开始",
+    "cancel": "取消"
   },
   "categories": {
     "Alle": "全部",

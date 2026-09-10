@@ -161,3 +161,8 @@ sammen med hårstregen. Filerne er fri igen.
 `deno task sync` (status/pull/push) i `tools/sync-recipes.ts`. Bevarer id og slug, så
 billedfilerne i repoet passer. Push kræver KAGEATELIER_SYNC_TOKEN på serveren, ellers 405.
 Rører `main.ts`, `deno.json`, `README.md`, `tools/`.
+
+## [2026-09-10 23:45] Claude — blender som kategori + Ny opskrift (c10 frigivet)
+Hjemmelavet mel er flyttet fra "Din kage" til en egen kategori-chip under Ingredienser.
+"Tøm opskrift" hedder nu "Ny opskrift" og spørger i en modal, hvis der er ugemt arbejde.
+Guldfarvet tastaturfokus i stedet for browserens blå ring. Filerne er fri.

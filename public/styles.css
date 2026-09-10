@@ -662,3 +662,31 @@ footer { margin-top: 22px; color: var(--text-soft); font-size: 12px; }
 .recipe-headline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .recipe-headline .recipe-title { margin: 0; }
 .recipe-controls .segmented { justify-self: start; }
+
+/* Blenderen bor i Ingredienser-fanen som sin egen kategori */
+.blend-box { margin-top: 0; max-width: 560px; }
+.blend-box[hidden] { display: none; }
+#catalog[hidden], #search[hidden] { display: none; }
+.chip-blend { border-style: dashed; }
+.chip-blend.on { border-style: solid; }
+
+/* Bekræft-dialog ved Ny opskrift */
+.modal-confirm { width: min(460px, 100%); }
+.modal-confirm h2 { margin: 0 0 10px; font-size: 20px; }
+.modal-confirm p { margin: 0 0 20px; color: var(--text-soft); line-height: 1.6; }
+.modal-actions { display: grid; gap: 10px; }
+.modal-actions .btn { width: 100%; }
+.modal-actions .btn:disabled { opacity: 0.6; cursor: progress; }
+
+/* Synlig tastaturfokus i husets farver, i stedet for browserens blå ring */
+.btn:focus-visible,
+.chip:focus-visible,
+.seg:focus-visible,
+.theme-chip:focus-visible,
+.locale-chip:focus-visible,
+.search:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

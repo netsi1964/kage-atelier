@@ -6,6 +6,7 @@ const DEFAULT_VIEW_SERVINGS = 2;
 const SUPPORTED_LOCALES = ["da", "en", "es", "ch"];
 const TABS = ["ingredients", "cake", "recipe"];
 const TAB_HASH = { ingredienser: "ingredients", kage: "cake", opskrift: "recipe" };
+const BLEND_CAT = "__blend";
 
 const state = {
   locale: loadLocale(),
@@ -26,6 +27,7 @@ const state = {
   currentRecipe: null,
   loadedRecipeId: "",
   savedRecipe: null,
+  savedSnapshot: "",
   uploadEnabled: false,
   activeTab: loadTab(),
   analyzeTimer: null,
@@ -98,6 +100,19 @@ function payload() {
   };
 }
 
+/** Fingeraftryk af det, der ville blive gemt. Ændrer det sig, er der ugemt arbejde. */
+function snapshot() {
+  return JSON.stringify({
+    items: state.items.map((row) => [row.id, row.grams]).sort(),
+    servings: state.servings,
+    cakeName: state.cakeName,
+  });
+}
+
+function isDirty() {
+  return state.items.length > 0 && snapshot() !== state.savedSnapshot;
+}
+
 function findIngredient(id) {
   return state.extras.concat(state.catalog).find((item) => item.id === id);
 }
@@ -163,7 +178,12 @@ function applyUiStrings() {
   setText("btnRandom", t("randomKeto"));
   setText("btnClassic", t("classicChocolate"));
   setText("btnKnowledge", t("knowledgeButton"));
-  setText("btnClear", t("clearRecipe"));
+  setText("btnClear", t("newRecipe", "Ny opskrift"));
+  setText("confirmTitle", t("unsavedTitle", "Din kage er ikke gemt"));
+  setText("confirmBody", t("unsavedBody"));
+  setText("confirmSave", t("unsavedSaveFirst", "Gem og start forfra"));
+  setText("confirmDiscard", t("unsavedDiscard", "Start forfra uden at gemme"));
+  setText("confirmCancel", t("cancel", "Fortryd"));
   setText("ingredientsSection", t("ingredientsSection"));
   setText("yourCakeSection", t("yourCakeSection"));
   setText("analysisSection", t("analysisSection"));
@@ -231,7 +251,7 @@ async function loadCatalog() {
   state.nuts = catalog.nuts;
   state.fibers = catalog.fibers;
   state.knowledge = catalog.knowledge;
-  if (!state.categories.includes(state.activeCat)) state.activeCat = allCategory();
+  if (state.activeCat !== BLEND_CAT && !state.categories.includes(state.activeCat)) state.activeCat = allCategory();
   renderCats();
   renderCatalog();
   renderBlendSelects();
@@ -239,9 +259,10 @@ async function loadCatalog() {
 }
 
 function renderCats() {
-  $("cats").innerHTML = state.categories.map((category) =>
-    `<button class="chip ${category === state.activeCat ? "on" : ""}" data-cat="${esc(category)}" type="button">${esc(category)}</button>`
-  ).join("");
+  const chip = (value, label, extra = "") =>
+    `<button class="chip ${extra} ${value === state.activeCat ? "on" : ""}" data-cat="${esc(value)}" type="button">${esc(label)}</button>`;
+  $("cats").innerHTML = state.categories.map((category) => chip(category, category)).join("") +
+    chip(BLEND_CAT, t("blendTitle", "Hjemmelavet mel"), "chip-blend");
   $("cats").querySelectorAll(".chip").forEach((button) => {
     button.onclick = () => {
       state.activeCat = button.dataset.cat;
@@ -252,6 +273,11 @@ function renderCats() {
 }
 
 function renderCatalog() {
+  const blending = state.activeCat === BLEND_CAT;
+  $("blendBox").hidden = !blending;
+  $("catalog").hidden = blending;
+  $("search").hidden = blending;
+  if (blending) return;
   const q = $("search").value.trim().toLowerCase();
   const all = allCategory();
   const items = state.catalog.concat(state.extras).filter((item) =>
@@ -616,6 +642,9 @@ async function blend() {
     state.extras.push(data.ingredient);
     state.items.push({ id: data.ingredient.id, grams: data.grams });
     state.loadedRecipeId = "";
+    state.activeCat = allCategory();
+    $("search").value = data.ingredient.name;
+    renderCats();
     renderCatalog();
     renderItems();
     scheduleAnalyze(0);
@@ -625,7 +654,7 @@ async function blend() {
 }
 
 async function saveRecipe() {
-  if (!state.items.length) return;
+  if (!state.items.length) return false;
   const title = $("saveTitle").value.trim() || state.cakeName || state.currentRecipe?.title || "";
   try {
     const saved = await api("/api/recipes", {
@@ -641,13 +670,16 @@ async function saveRecipe() {
     });
     state.loadedRecipeId = saved.id;
     state.savedRecipe = saved;
+    state.savedSnapshot = snapshot();
     renderRecipeImage();
     const imageNote = saved.images?.find((image) => image.kind === "cover")?.url
       ? ""
       : ` · Billede: læg ${saved.imagePath} (jpg, png eller webp) i repoet, eller upload fra opskriftsbiblioteket.`;
     $("saveStatus").textContent = `${t("saveStored")}: ${saved.title}${imageNote}`;
+    return true;
   } catch (err) {
     $("saveStatus").textContent = `${t("saveFailed")}: ${err.message}`;
+    return false;
   }
 }
 
@@ -662,6 +694,7 @@ async function loadSavedRecipeFromUrl() {
     state.servings = recipe.servings || state.servings;
     state.loadedRecipeId = recipe.id;
     state.savedRecipe = recipe;
+    state.savedSnapshot = snapshot();
     renderRecipeImage();
     $("saveTitle").value = state.cakeName;
     renderCatalog();
@@ -686,11 +719,32 @@ async function copyMarkdown() {
   }
 }
 
+function startNewRecipe() {
+  if (!isDirty()) return clearRecipe();
+  toggleConfirm(true);
+}
+
+function toggleConfirm(open) {
+  $("confirmModal").style.display = open ? "flex" : "none";
+  if (open) $("confirmCancel").focus();
+}
+
+async function saveThenClear() {
+  const status = $("confirmSave");
+  status.disabled = true;
+  const ok = await saveRecipe();
+  status.disabled = false;
+  if (!ok) return;
+  toggleConfirm(false);
+  clearRecipe();
+}
+
 function clearRecipe() {
   state.items = [];
   state.cakeName = "";
   state.loadedRecipeId = "";
   state.savedRecipe = null;
+  state.savedSnapshot = "";
   $("saveTitle").value = "";
   $("saveStatus").textContent = "";
   $("recipeImageStatus").textContent = "";
@@ -735,7 +789,16 @@ function bind() {
   $("btnKnowledge").onclick = () => toggleModal(true);
   $("closeModal").onclick = () => toggleModal(false);
   $("modal").onclick = (event) => { if (event.target === $("modal")) toggleModal(false); };
-  $("btnClear").onclick = clearRecipe;
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    toggleModal(false);
+    toggleConfirm(false);
+  });
+  $("btnClear").onclick = startNewRecipe;
+  $("confirmCancel").onclick = () => toggleConfirm(false);
+  $("confirmDiscard").onclick = () => { toggleConfirm(false); clearRecipe(); };
+  $("confirmSave").onclick = saveThenClear;
+  $("confirmModal").onclick = (event) => { if (event.target === $("confirmModal")) toggleConfirm(false); };
   $("btnBlend").onclick = blend;
   $("btnSave").onclick = saveRecipe;
   $("btnCopy").onclick = copyMarkdown;
