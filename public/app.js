@@ -4,6 +4,8 @@ const $ = (id) => document.getElementById(id);
 const DEFAULT_SERVINGS = 8;
 const DEFAULT_VIEW_SERVINGS = 2;
 const SUPPORTED_LOCALES = ["da", "en", "es", "ch"];
+const TABS = ["ingredients", "cake", "recipe"];
+const TAB_HASH = { ingredienser: "ingredients", kage: "cake", opskrift: "recipe" };
 
 const state = {
   locale: loadLocale(),
@@ -23,6 +25,9 @@ const state = {
   analysis: null,
   currentRecipe: null,
   loadedRecipeId: "",
+  savedRecipe: null,
+  uploadEnabled: false,
+  activeTab: loadTab(),
   analyzeTimer: null,
 };
 
@@ -42,6 +47,17 @@ function loadLocale() {
     if (SUPPORTED_LOCALES.includes(saved)) return saved;
   } catch { /* ignore */ }
   return "da";
+}
+
+function loadTab() {
+  const fromHash = TAB_HASH[location.hash.replace("#", "").toLowerCase()];
+  if (fromHash) return fromHash;
+  if (new URLSearchParams(location.search).get("recipe")) return "recipe";
+  try {
+    const saved = localStorage.getItem("kageatelier-tab");
+    if (saved === "ingredients" || saved === "cake" || saved === "recipe") return saved;
+  } catch { /* ignore */ }
+  return "ingredients";
 }
 
 function t(key, fallback) {
@@ -92,6 +108,28 @@ function allCategory() {
 
 // ---------- tema og sprog ----------
 
+function setTab(tab, { persist = true } = {}) {
+  if (!TABS.includes(tab)) tab = "ingredients";
+  state.activeTab = tab;
+  if (persist) {
+    try { localStorage.setItem("kageatelier-tab", tab); } catch { /* ignore */ }
+  }
+  document.querySelectorAll("#tabs [data-tab]").forEach((button) => {
+    const on = button.dataset.tab === tab;
+    button.classList.toggle("on", on);
+    button.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.querySelectorAll("[data-panel]").forEach((panel) => {
+    const on = panel.dataset.panel === tab;
+    panel.classList.toggle("on", on);
+    panel.hidden = !on;
+  });
+  if (persist) {
+    const slug = Object.keys(TAB_HASH).find((key) => TAB_HASH[key] === tab);
+    if (slug) history.replaceState(null, "", `#${slug}`);
+  }
+}
+
 function applyTheme(theme) {
   state.theme = theme;
   document.documentElement.dataset.theme = theme;
@@ -129,10 +167,15 @@ function applyUiStrings() {
   setText("ingredientsSection", t("ingredientsSection"));
   setText("yourCakeSection", t("yourCakeSection"));
   setText("analysisSection", t("analysisSection"));
-  setText("recipeSection", t("recipeSection"));
   setPlaceholder("search", t("searchPlaceholder"));
   setText("servingsFieldLabel", t("servingsField"));
   setText("unitModeFieldLabel", t("unitModeField"));
+  setText("recipeServingsFieldLabel", t("servingsField"));
+  setText("recipeUnitModeFieldLabel", t("unitModeField"));
+  setText("tabIngredients", t("ingredientsSection"));
+  setText("tabCakeLabel", t("yourCakeSection"));
+  setText("tabRecipe", t("recipeSection"));
+  setText("recipeImageHeading", t("recipeImageHeading", "Billede"));
   setText("blendTitle", t("blendTitle"));
   setText("blendBody", t("blendBody"));
   setPlaceholder("blendName", t("blendNamePlaceholder"));
@@ -149,7 +192,7 @@ function applyUiStrings() {
   document.querySelectorAll("#themeToggle [data-theme]").forEach((button) => {
     button.textContent = button.dataset.theme === "light" ? t("themeLight") : t("themeDark");
   });
-  document.querySelectorAll("#unitModes [data-unit]").forEach((button) => {
+  document.querySelectorAll("#unitModes [data-unit], #recipeUnitModes [data-unit]").forEach((button) => {
     button.textContent = button.dataset.unit === "kitchen" ? t("unitKitchen") : t("unitWeight");
   });
   const scoreLabels = [t("scoreSuccess"), t("scoreTaste"), t("scoreKeto")];
@@ -264,11 +307,32 @@ function removeIngredient(id) {
 function renderServingsHint() {
   setText("servingsHint", t("servingsHint"));
   $("servings").value = state.servings;
+  if ($("recipeServings")) $("recipeServings").value = state.servings;
+}
+
+function applyServings(raw) {
+  const value = Math.max(1, Math.min(32, Math.round(Number(raw) || DEFAULT_VIEW_SERVINGS)));
+  state.servings = value;
+  renderItems();
+  scheduleAnalyze(0);
+}
+
+function applyUnitMode(unit) {
+  state.unitMode = unit;
+  document.querySelectorAll("#unitModes [data-unit], #recipeUnitModes [data-unit]").forEach((button) => {
+    button.classList.toggle("on", button.dataset.unit === unit);
+  });
+  renderRecipeCard(state.currentRecipe);
 }
 
 function renderItems() {
   const total = state.items.reduce((sum, row) => sum + displayGrams(row.grams), 0);
   setText("totalWeight", `${Math.round(total)} g`);
+  const count = $("tabCakeCount");
+  if (count) {
+    count.textContent = String(state.items.length);
+    count.hidden = state.items.length === 0;
+  }
   renderServingsHint();
   if (!state.items.length) {
     $("recipe").className = "empty";
@@ -459,12 +523,67 @@ function renderRecipeCard(recipe) {
   $("recipeMethod").innerHTML = `<ol>${recipe.steps.map((step) => `<li>${esc(step)}</li>`).join("")}</ol>`;
 }
 
+// ---------- billede i opskrift-fanen ----------
+
+function renderRecipeImage() {
+  const body = $("recipeImageBody");
+  if (!body) return;
+  const saved = state.savedRecipe;
+  if (!saved) {
+    body.innerHTML = `<div class="recipe-image-empty tiny">${esc(t("imageSaveFirst", "Gem opskriften først — så kan du lægge et billede på."))}</div>`;
+    return;
+  }
+  const cover = saved.images?.find((image) => image.kind === "cover" && image.url) ?? saved.images?.find((image) => image.url);
+  const picture = cover?.url
+    ? `<img class="recipe-image-photo" src="${esc(cover.url)}" alt="${esc(cover.alt ?? saved.title)}" />`
+    : `<div class="recipe-image-placeholder tiny">${esc(t("imageMissing", "Intet billede endnu"))} · <code>${esc(saved.imagePath ?? "")}</code> (.jpg / .png / .webp)</div>`;
+  const upload = state.uploadEnabled
+    ? `<label class="btn btn-ghost upload-btn">${esc(cover?.url ? t("imageChange", "Skift billede") : t("imageUpload", "Upload billede"))}<input type="file" accept="image/jpeg,image/png,image/webp" id="recipeImageInput" hidden /></label>`
+    : `<div class="tiny">${esc(t("imageUploadDisabled", "Upload er slået fra her. Læg filen i repoet og push."))}</div>`;
+  body.innerHTML = `${picture}<div class="recipe-image-actions">${upload}</div>`;
+  const input = $("recipeImageInput");
+  if (input) input.onchange = () => uploadRecipeImage(input.files?.[0]);
+}
+
+async function uploadRecipeImage(file) {
+  const saved = state.savedRecipe;
+  if (!file || !saved) return;
+  const status = $("recipeImageStatus");
+  if (status) status.textContent = t("imageUploading", "Uploader…");
+  try {
+    const res = await fetch(`/api/recipes/${encodeURIComponent(saved.id)}/image`, {
+      method: "POST",
+      headers: { "content-type": file.type },
+      body: file,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Upload fejlede");
+    const fresh = await api(`/api/recipes/${encodeURIComponent(saved.id)}`);
+    state.savedRecipe = fresh;
+    renderRecipeImage();
+    if (status) status.textContent = `${t("imageSavedAs", "Gemt som")} ${data.path}. ${t("imageCommitHint", "Husk: git add + commit + push.")}`;
+  } catch (err) {
+    if (status) status.textContent = err.message;
+  }
+}
+
+async function loadHealth() {
+  try {
+    const health = await api("/api/health");
+    state.uploadEnabled = Boolean(health.imageUpload);
+  } catch {
+    state.uploadEnabled = false;
+  }
+}
+
 // ---------- generatorer, blend, gem ----------
 
 function applyPreset(data) {
   state.items = data.items.map((row) => ({ id: row.id, grams: row.grams }));
   state.cakeName = data.cakeName ?? "";
   state.loadedRecipeId = "";
+  state.savedRecipe = null;
+  renderRecipeImage();
   $("saveTitle").value = state.cakeName;
   renderItems();
   renderAnalysis(data);
@@ -521,6 +640,8 @@ async function saveRecipe() {
       }),
     });
     state.loadedRecipeId = saved.id;
+    state.savedRecipe = saved;
+    renderRecipeImage();
     const imageNote = saved.images?.find((image) => image.kind === "cover")?.url
       ? ""
       : ` · Billede: læg ${saved.imagePath} (jpg, png eller webp) i repoet, eller upload fra opskriftsbiblioteket.`;
@@ -540,6 +661,8 @@ async function loadSavedRecipeFromUrl() {
     state.cakeName = recipe.cakeName || recipe.title || "";
     state.servings = recipe.servings || state.servings;
     state.loadedRecipeId = recipe.id;
+    state.savedRecipe = recipe;
+    renderRecipeImage();
     $("saveTitle").value = state.cakeName;
     renderCatalog();
     renderItems();
@@ -567,10 +690,13 @@ function clearRecipe() {
   state.items = [];
   state.cakeName = "";
   state.loadedRecipeId = "";
+  state.savedRecipe = null;
   $("saveTitle").value = "";
   $("saveStatus").textContent = "";
+  $("recipeImageStatus").textContent = "";
   renderItems();
   renderAnalysis(null);
+  renderRecipeImage();
 }
 
 function toggleModal(open) {
@@ -586,20 +712,24 @@ function bind() {
   document.querySelectorAll("#localeToggle [data-locale]").forEach((button) => {
     button.onclick = () => setLocale(button.dataset.locale);
   });
-  document.querySelectorAll("#unitModes [data-unit]").forEach((button) => {
-    button.onclick = () => {
-      state.unitMode = button.dataset.unit;
-      document.querySelectorAll("#unitModes [data-unit]").forEach((b) => b.classList.toggle("on", b === button));
-      renderRecipeCard(state.currentRecipe);
-    };
+  document.querySelectorAll("#unitModes [data-unit], #recipeUnitModes [data-unit]").forEach((button) => {
+    button.onclick = () => applyUnitMode(button.dataset.unit);
   });
-  $("search").oninput = renderCatalog;
-  $("servings").onchange = () => {
-    const value = Math.max(1, Math.min(32, Math.round(Number($("servings").value) || DEFAULT_VIEW_SERVINGS)));
-    state.servings = value;
-    renderItems();
-    scheduleAnalyze(0);
+  document.querySelectorAll("#tabs [data-tab]").forEach((button) => {
+    button.onclick = () => setTab(button.dataset.tab);
+  });
+  $("tabs").onkeydown = (event) => {
+    const keys = { ArrowLeft: -1, ArrowRight: 1 };
+    const step = keys[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = TABS[(TABS.indexOf(state.activeTab) + step + TABS.length) % TABS.length];
+    setTab(next);
+    document.querySelector(`#tabs [data-tab="${next}"]`)?.focus();
   };
+  $("search").oninput = renderCatalog;
+  $("servings").onchange = () => applyServings($("servings").value);
+  $("recipeServings").onchange = () => applyServings($("recipeServings").value);
   $("btnRandom").onclick = () => runPreset("/api/random-keto");
   $("btnClassic").onclick = () => runPreset("/api/classic");
   $("btnKnowledge").onclick = () => toggleModal(true);
@@ -616,7 +746,9 @@ function bind() {
 async function init() {
   applyTheme(state.theme);
   bind();
+  setTab(state.activeTab, { persist: false });
   await loadLocaleBundle();
+  await loadHealth();
   try {
     await loadCatalog();
   } catch (err) {
@@ -625,6 +757,7 @@ async function init() {
   }
   renderItems();
   renderAnalysis(null);
+  renderRecipeImage();
   await loadSavedRecipeFromUrl();
 }
 

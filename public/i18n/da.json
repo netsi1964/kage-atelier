@@ -78,7 +78,15 @@
     "macroFat": "Fedt",
     "macroProtein": "Protein",
     "macroPerSliceCaption": "pr. stykke",
-    "imageMissing": "Intet billede endnu"
+    "imageMissing": "Intet billede endnu",
+    "recipeImageHeading": "Billede",
+    "imageSaveFirst": "Gem opskriften først — så kan du lægge et billede på.",
+    "imageUpload": "Upload billede",
+    "imageChange": "Skift billede",
+    "imageUploading": "Uploader…",
+    "imageSavedAs": "Gemt som",
+    "imageCommitHint": "Husk: git add + commit + push.",
+    "imageUploadDisabled": "Upload er slået fra her. Læg filen i repoet og push."
   },
   "categories": {
     "Alle": "Alle",

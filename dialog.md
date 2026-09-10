@@ -147,3 +147,12 @@ public/images/recipes/<slug>.jpg auto-kobles. Lokal upload i biblioteket. Pushet
 
 ## [2026-09-06 22:07] Claude — KV på Deploy kræver attach i dashboard
 Ellers ephemeral pr. isolat. README opdateret. PNG-hint i UI.
+
+## [2026-09-10 23:20] Claude — faneblade på atelier-siden (c8 aktiv)
+Tager `public/index.html`, `public/app.js`, `public/styles.css`, `public/i18n/*.json`.
+Tre faner: Ingredienser · Din kage (kage + live vurdering) · Opskrift (med personer + billede).
+
+## [2026-09-10 23:15] Claude — faneblade færdige (c8 frigivet)
+Tre faner med deep-link (#ingredienser / #kage / #opskrift). Opskrift-fanen har nu
+personer, køkkenmål/vægt og billede med upload. Aktiv fane = guldkant der smelter
+sammen med hårstregen. Filerne er fri igen.

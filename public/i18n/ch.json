@@ -78,7 +78,15 @@
     "macroFat": "脂肪",
     "macroProtein": "蛋白质",
     "macroPerSliceCaption": "每块",
-    "imageMissing": "暂无图片"
+    "imageMissing": "还没有照片",
+    "recipeImageHeading": "照片",
+    "imageSaveFirst": "请先保存食谱，然后就能添加照片。",
+    "imageUpload": "上传照片",
+    "imageChange": "更换照片",
+    "imageUploading": "上传中…",
+    "imageSavedAs": "已保存为",
+    "imageCommitHint": "别忘了：git add + commit + push。",
+    "imageUploadDisabled": "此处已关闭上传。请将文件放入仓库并推送。"
   },
   "categories": {
     "Alle": "全部",

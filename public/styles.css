@@ -152,14 +152,109 @@ header.hero {
 .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
 .btn-danger { background: #8e544a; color: #fff3f0; }
 
+/* Faneblade: det aktive er det eneste med en kant, og det smelter sammen med
+   hårstregen, der udgør indholdsfladens overkant. */
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin: 28px 0 0;
+  position: relative;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tabs::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: 14px 24px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.tab:hover { color: var(--text); background: rgba(191, 131, 66, 0.07); }
+
+.tab.on {
+  background: var(--panel);
+  border-color: var(--gold);
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* Dækker hårstregen, så det aktive faneblad hænger sammen med indholdet. */
+.tab.on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--panel);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -4px;
+  border-radius: 16px 16px 0 0;
+}
+
+.tab-count {
+  display: inline-block;
+  margin-left: 8px;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(191, 131, 66, 0.16);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-theme="dark"] .tab-count { background: rgba(198, 141, 72, 0.22); }
+
+.tabpanel { padding-top: 22px; }
+.tabpanel[hidden] { display: none; }
+
 .layout {
   display: grid;
   grid-template-columns: 340px 1fr 360px;
   gap: 22px;
 }
 
+.layout-cake { grid-template-columns: 1fr 380px; }
+
 @media (max-width: 1100px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout,
+  .layout-cake { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .tabs { padding: 0 2px; }
+  .tab { flex: 1 1 0; padding: 12px 8px; text-align: center; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab { transition: none; }
 }
 
 .card {
@@ -235,7 +330,17 @@ select {
 
 .chip.on { background: rgba(191, 131, 66, 0.15); color: var(--gold); border-color: var(--gold); }
 
-.ing-list { max-height: 620px; overflow: auto; display: grid; gap: 12px; padding-right: 4px; }
+.ing-list {
+  max-height: 620px;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  padding-right: 4px;
+}
+
+#panelIngredients .ing-list { max-height: min(64vh, 720px); }
+#panelIngredients .search { max-width: 520px; }
 
 .ing,
 .recipe-item,
@@ -482,11 +587,18 @@ footer { margin-top: 22px; color: var(--text-soft); font-size: 12px; }
 @media print {
   body { background: #fff; color: #222; }
   header.hero,
+  .tabs,
+  #panelIngredients,
+  #panelCake,
   .layout > .card:not(.recipe-card),
   .hero-actions,
+  .recipe-image-actions,
+  .upload-status,
+  .recipe-controls,
   .copy-row,
   footer { display: none !important; }
   .layout { display: block; }
+  #panelRecipe { display: block !important; padding-top: 0; }
   .recipe-card { display: block; background: #fff; border: 0; box-shadow: none; color: #222; }
   .recipe-card h2,
   .recipe-title,
@@ -514,3 +626,39 @@ footer { margin-top: 22px; color: var(--text-soft); font-size: 12px; }
 .browse-placeholder-image img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; opacity: 0.9; }
 .browse-placeholder-image span { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; font-size: 12px; background: rgba(40, 24, 12, 0.55); color: #fff; }
 .browse-placeholder-image code { color: #ffe2b0; }
+
+/* Billede i opskrift-fanen */
+.recipe-image { margin-top: 20px; }
+.recipe-image-body { display: grid; gap: 12px; justify-items: start; }
+
+.recipe-image-photo {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+
+.recipe-image-placeholder,
+.recipe-image-empty {
+  width: 100%;
+  max-width: 520px;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px dashed var(--line);
+  background: var(--panel-strong);
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+:root[data-theme="dark"] .recipe-image-placeholder,
+:root[data-theme="dark"] .recipe-image-empty { background: #1f1711; }
+
+.recipe-image-placeholder code { word-break: break-all; color: var(--gold); }
+.recipe-image-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.recipe-headline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.recipe-headline .recipe-title { margin: 0; }
+.recipe-controls .segmented { justify-self: start; }

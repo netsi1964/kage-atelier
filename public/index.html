@@ -38,9 +38,15 @@
       </div>
     </header>
 
-    <div class="layout">
+
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Sektioner">
+      <button class="tab on" type="button" role="tab" id="tabIngredients" data-tab="ingredients" aria-controls="panelIngredients" aria-selected="true">Ingredienser</button>
+      <button class="tab" type="button" role="tab" id="tabCake" data-tab="cake" aria-controls="panelCake" aria-selected="false"><span id="tabCakeLabel">Din kage</span><span class="tab-count" id="tabCakeCount" hidden>0</span></button>
+      <button class="tab" type="button" role="tab" id="tabRecipe" data-tab="recipe" aria-controls="panelRecipe" aria-selected="false">Opskrift</button>
+    </nav>
+
+    <div class="tabpanel on" id="panelIngredients" role="tabpanel" data-panel="ingredients" aria-labelledby="tabIngredients">
       <section class="card">
-          <h2 id="ingredientsSection">Ingredienser</h2>
         <div class="body">
           <input class="search" id="search" placeholder="Søg ingrediens…" />
           <div class="cats" id="cats"></div>
@@ -48,6 +54,10 @@
         </div>
       </section>
 
+    </div>
+
+    <div class="tabpanel" id="panelCake" role="tabpanel" data-panel="cake" aria-labelledby="tabCake" hidden>
+      <div class="layout layout-cake">
       <section class="card">
         <h2>
             <span id="yourCakeSection">Din kage</span>
@@ -70,8 +80,7 @@
           <div class="tiny" id="servingsHint">Appen skalerer automatisk en grundopskrift på 8 stykker til det antal personer, du vælger.</div>
           <div id="recipe" class="empty">Tilføj ingredienser fra venstre — eller tryk på en generator.</div>
           <div class="keto-box" style="margin-top:16px">
-            <strong>Hjemmelavet mel</strong>
-              <strong id="blendTitle">Hjemmelavet mel</strong>
+            <strong id="blendTitle">Hjemmelavet mel</strong>
               <p class="tiny" id="blendBody">Blend nødder og fibre. Backend beregner egenskaberne og sender et nyt mel tilbage.</p>
             <div class="blend">
               <div class="blend-row">
@@ -108,17 +117,31 @@
           <div class="impact" id="impacts"></div>
         </div>
       </section>
+      </div>
     </div>
 
+    <div class="tabpanel" id="panelRecipe" role="tabpanel" data-panel="recipe" aria-labelledby="tabRecipe" hidden>
     <section class="card recipe-card" id="recipeCard">
-      <h2>
-          <span id="recipeSection">Opskrift</span>
-        <span class="tiny" id="recipeBadge">Tom</span>
-      </h2>
       <div class="body">
-        <h3 class="recipe-title" id="recipeTitle">Din kage</h3>
+        <div class="recipe-headline">
+          <h3 class="recipe-title" id="recipeTitle">Din kage</h3>
+          <span class="pill pill-mid" id="recipeBadge">Tom</span>
+        </div>
         <p class="recipe-lead" id="recipeLead">Backend skriver opskriften, når der er ingredienser.</p>
         <div class="recipe-meta" id="recipeMeta"></div>
+        <div class="recipe-controls">
+          <label class="field">
+            <span class="field-label" id="recipeServingsFieldLabel">Personer</span>
+            <label class="input-unit input-unit-soft"><input id="recipeServings" type="number" min="1" max="32" value="2" /><span>pers.</span></label>
+          </label>
+          <div class="field">
+            <span class="field-label" id="recipeUnitModeFieldLabel">Vis ingredienser som</span>
+            <div class="segmented" id="recipeUnitModes">
+              <button class="seg on" data-unit="kitchen" type="button">Køkkenmål</button>
+              <button class="seg" data-unit="weight" type="button">Vægt</button>
+            </div>
+          </div>
+        </div>
         <div class="recipe-grid">
           <div>
               <h3 id="recipeIngredientsHeading">Ingredienser</h3>
@@ -128,6 +151,11 @@
             <h3 id="recipeMethodHeading">Fremgangsmåde</h3>
             <div id="recipeMethod" class="empty">Metoden skrives på serveren.</div>
           </div>
+        </div>
+        <div class="recipe-image" id="recipeImage">
+          <h3 id="recipeImageHeading">Billede</h3>
+          <div class="recipe-image-body" id="recipeImageBody"></div>
+          <div class="tiny upload-status" id="recipeImageStatus"></div>
         </div>
         <div class="copy-row">
           <input id="saveTitle" class="search save-input" placeholder="Navn til gemt opskrift" />
@@ -139,6 +167,7 @@
         <div class="tiny" id="saveStatus"></div>
       </div>
     </section>
+    </div>
 
     <footer>
       Beregninger kører i Deno-modulet <code>lib/engine.ts</code>. UI’en viser kun svaret. Modellen er heuristisk og erstatter ikke en testbagning.

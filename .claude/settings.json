@@ -5,7 +5,8 @@
       "Bash(rm \"public/images/recipes/:sesam-tahin-chokolade-fd3bd517.jpg\")",
       "Bash(git add *)",
       "Bash(git commit -m 'Indstillinger: PermissionPolicy-allowlist for mindre prompter *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx|jsx|js\\)$\")"
     ]
   }
 }

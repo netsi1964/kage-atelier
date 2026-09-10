@@ -78,7 +78,15 @@
     "macroFat": "Fat",
     "macroProtein": "Protein",
     "macroPerSliceCaption": "per serving",
-    "imageMissing": "No image yet"
+    "imageMissing": "No photo yet",
+    "recipeImageHeading": "Photo",
+    "imageSaveFirst": "Save the recipe first, then you can add a photo.",
+    "imageUpload": "Upload photo",
+    "imageChange": "Replace photo",
+    "imageUploading": "Uploading…",
+    "imageSavedAs": "Saved as",
+    "imageCommitHint": "Remember: git add + commit + push.",
+    "imageUploadDisabled": "Upload is off here. Put the file in the repo and push."
   },
   "categories": {
     "Alle": "All",

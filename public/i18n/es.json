@@ -78,7 +78,15 @@
     "macroFat": "Grasa",
     "macroProtein": "Proteína",
     "macroPerSliceCaption": "por porción",
-    "imageMissing": "Sin imagen todavía"
+    "imageMissing": "Aún no hay foto",
+    "recipeImageHeading": "Foto",
+    "imageSaveFirst": "Guarda la receta primero y luego podrás añadir una foto.",
+    "imageUpload": "Subir foto",
+    "imageChange": "Cambiar foto",
+    "imageUploading": "Subiendo…",
+    "imageSavedAs": "Guardada como",
+    "imageCommitHint": "Recuerda: git add + commit + push.",
+    "imageUploadDisabled": "La subida está desactivada aquí. Pon el archivo en el repo y haz push."
   },
   "categories": {
     "Alle": "Todo",
